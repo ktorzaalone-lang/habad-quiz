@@ -202,7 +202,7 @@ function home(){
     h("div",{class:"stack"},
       h("button",{class:"btn tile",onclick:soloSetup},
         h("div",{class:"ic"},svg(ICON.solo)), h("div",null,h("b",null,"Jouer en solo"),h("span",null,"Choisis un thème et un niveau"))),
-      window.claude && h("button",{class:"btn tile",onclick:multiHome},
+      h("button",{class:"btn tile",onclick:multiHome},
         h("div",{class:"ic"},svg(ICON.multi)), h("div",null,h("b",null,"Multijoueur"),h("span",null,"Crée une partie ou rejoins-la avec un code"))),
       mistakes ? h("button",{class:"btn tile",onclick:()=>startSolo(shuffle(Object.keys(progress).filter(k=>progress[k][2]===0).map(Number)).slice(0,20),"Mes erreurs")},
         h("div",{class:"ic"},svg(ICON.redo)), h("div",null,h("b",null,"Revoir mes erreurs"),h("span",null,`${mistakes} question${mistakes>1?"s":""} à retravailler`))) : null,
@@ -329,6 +329,7 @@ let roomNS = null;           // lobby namespace, or null
 let roomReady = false;
 let game = null;             // current multiplayer session
 let myName = store.get("hq_name", "");
+let myPresencePending = null;
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 function newCode(){ let s=""; for(let i=0;i<5;i++) s += CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)]; return s; }
 function cleanName(s){ return String(s||"").replace(/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁠-⁯﻿]/g,"").trim().slice(0,18); }
@@ -337,9 +338,9 @@ function cleanName(s){ return String(s||"").replace(/[\u0000-\u001f\u007f-\u009f
 
 function multiHome(){
   if(!roomReady){ toast("Connexion en cours, réessaie dans un instant."); return; }
-  if(!roomNS){
-    render(header("Multijoueur", home), h("h2",null,"Multijoueur indisponible ici"),
-      h("p",{class:"muted"},"Le mode multijoueur fonctionne quand le quiz est ouvert depuis Claude avec un compte connecté. Ouvre le lien du quiz dans l'app Claude ou sur claude.ai."),
+  if(!navigator.onLine){
+    render(header("Multijoueur", home), h("h2",null,"Pas de connexion"),
+      h("p",{class:"muted"},"Le multijoueur a besoin d'internet. Le mode solo, lui, marche hors connexion."),
       h("div",{class:"spacer"}), h("button",{class:"btn primary",onclick:home},"Retour à l'accueil"));
     return;
   }
@@ -364,7 +365,7 @@ function multiHome(){
       h("span",{class:"label"},"Créer une partie"),
       h("p",{class:"muted small"},"Tu obtiens un code à partager. Tu joues aussi."),
       h("button",{class:"btn center",onclick:()=>{ if(takeName()) hostSetup(); }},"Créer une partie")),
-    h("p",{class:"muted small"},"Chaque joueur doit ouvrir ce quiz depuis Claude, avec un compte qui a accès au lien.")
+    h("p",{class:"muted small"},"Partage le lien du quiz à tes amis : ils ouvrent « Multijoueur » et tapent ton code. Garde l'appli ouverte pendant la partie.")
   );
 }
 
@@ -388,11 +389,75 @@ function hostSetup(){
   drawLvl(); upd();
 }
 
+function loadPeer(){
+  if(window.Peer) return Promise.resolve();
+  return new Promise((ok,ko)=>{ const s=document.createElement("script"); s.src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"; s.onload=ok; s.onerror=ko; document.head.append(s); });
+}
+function peerRoom(code, isHost){
+  // Minimal stand-in for the room API, over PeerJS data channels (host is the hub)
+  return new Promise((resolve, reject)=>{
+    const hostId = "hq770-" + code.toLowerCase();
+    const peer = isHost ? new Peer(hostId) : new Peer();
+    const conns = {};            // host side: peerId -> {conn, presence}
+    let hostConn = null;         // player side
+    let peersCb = null, errCb = null, me = null, lastSt = null, done = false;
+    const myPresence = {};
+    function snapshot(){
+      const list = [{peer:me, sameTab:true, presence:{...myPresence}}];
+      for(const id in conns) list.push({peer:id, sameTab:false, presence:conns[id].presence});
+      return list;
+    }
+    const emit = ()=>{ if(peersCb) peersCb({peers:snapshot()}); };
+    const api = {
+      presence(patch){
+        for(const k in patch){ if(patch[k]===null) delete myPresence[k]; else myPresence[k]=patch[k]; }
+        if(isHost){ if(patch.st){ lastSt = patch.st; for(const id in conns){ try{ conns[id].conn.send({t:"st", st:patch.st}); }catch(e){} } } }
+        else if(hostConn && hostConn.open){ try{ hostConn.send({t:"p", patch}); }catch(e){} }
+        return Promise.resolve();
+      },
+      onPeers(cb, onErr){ peersCb = cb; errCb = onErr; setTimeout(emit,0); return ()=>{ peersCb=null; }; },
+      leave(){ done = true; try{ peer.destroy(); }catch(e){} return Promise.resolve(); }
+    };
+    peer.on("open", id=>{
+      me = id;
+      if(isHost){ resolve(api); return; }
+      hostConn = peer.connect(hostId, {reliable:true});
+      let opened = false;
+      const t = setTimeout(()=>{ if(!opened){ done = true; try{ peer.destroy(); }catch(e){} reject(new Error("nohost")); } }, 9000);
+      hostConn.on("open", ()=>{ opened = true; clearTimeout(t); hostConn.send({t:"p", patch:{...myPresence}}); resolve(api); });
+      hostConn.on("data", m=>{ if(m && m.t==="st" && game && !game.isHost){ game.hostPeer = hostId; if(!game.st || m.st.v!==game.st.v){ game.st = m.st; playerRender(); } } });
+      hostConn.on("close", ()=>{ if(!done && game && !game.isHost) hostGone(); });
+    });
+    peer.on("connection", conn=>{
+      if(!isHost) return;
+      conn.on("open", ()=>{ conns[conn.peer] = {conn, presence:{}}; if(lastSt) conn.send({t:"st", st:lastSt}); emit(); });
+      conn.on("data", m=>{ if(m && m.t==="p" && conns[conn.peer]){ const pr = {...conns[conn.peer].presence}; for(const k in m.patch){ if(m.patch[k]===null) delete pr[k]; else pr[k]=m.patch[k]; } conns[conn.peer].presence = pr; emit(); } });
+      conn.on("close", ()=>{ delete conns[conn.peer]; emit(); });
+    });
+    peer.on("error", e=>{
+      if(done) return;
+      if(e && e.type==="unavailable-id"){ done = true; try{ peer.destroy(); }catch(_){} reject(new Error("taken")); return; }
+      if(e && e.type==="peer-unavailable"){ done = true; try{ peer.destroy(); }catch(_){} reject(new Error("nohost")); return; }
+      if(me===null){ done = true; reject(e); }
+    });
+  });
+}
 async function joinGame(code, isHost){
   render(h("div",{class:"loading"},"Connexion à la partie…"));
   let r;
-  try{ r = await roomNS.join("hq-" + code.toLowerCase()); }
-  catch(e){ render(header("Multijoueur", multiHome), h("h2",null,"Connexion impossible"), h("p",{class:"muted"},"La partie n'a pas pu être rejointe. Vérifie ta connexion et réessaie."), h("button",{class:"btn primary",onclick:multiHome},"Réessayer")); return; }
+  try{
+    if(roomNS) r = await roomNS.join("hq-" + code.toLowerCase());
+    else {
+      await loadPeer();
+      if(!isHost) myPresencePending = {r:"p", nm:myName};
+      r = await peerRoom(code, isHost);
+    }
+  }
+  catch(e){
+    if(e && e.message==="taken" && isHost){ return joinGame(newCode(), true); }
+    if(e && e.message==="nohost"){ render(header("Multijoueur", multiHome), h("h2",null,"Aucune partie trouvée"), h("p",{class:"muted"},`Personne n'héberge la partie ${code} en ce moment. Vérifie le code avec l'hôte, et demande-lui de garder l'appli ouverte.`), h("button",{class:"btn primary",onclick:multiHome},"Retour")); return; }
+    render(header("Multijoueur", multiHome), h("h2",null,"Connexion impossible"), h("p",{class:"muted"},"La partie n'a pas pu être rejointe. Vérifie ta connexion et réessaie."), h("button",{class:"btn primary",onclick:multiHome},"Réessayer")); return;
+  }
   game = {code, isHost, r, unsubs:[], st:null, hostPeer:null, myPeer:null, myAns:null, shownAt:0, shownIdx:-1, ended:false};
   const me = { r: isHost ? "h" : "p", nm: myName };
   await r.presence(me).catch(()=>{});
