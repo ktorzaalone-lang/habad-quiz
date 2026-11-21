@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quiz Habad</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Quiz Habad">
+<meta name="theme-color" content="#0d1630">
+<meta name="description" content="Quiz Habad : 1565 questions sur les 7 Rebbeim, la hassidout, les minhaguim et l'histoire de Habad.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: one-screen app, a single centred column (max 560px), screens swapped in place. Night-blue world with gold accents. */
+:root{
+  color-scheme: dark;
+  --bg:#0d1630;
+  --surface:#16224a;
+  --surface-2:#1e2d5e;
+  --line:#2c3c74;
+  --ink:#f4f1e8;
+  --muted:#a9b2d3;
+  --gold:#e2b545;
+  --gold-ink:#1a1405;
+  --good:#3fbf7f;
+  --bad:#e5604f;
+  --display:"Fraunces", Georgia, serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+#app{max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 18px) calc(env(safe-area-inset-right) + 18px) calc(env(safe-area-inset-bottom) + 22px) calc(env(safe-area-inset-left) + 18px);gap:18px}
+h1,h2{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:2.3rem;line-height:1.05}
+h2{font-size:1.5rem;line-height:1.15}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.row{display:flex;gap:10px;align-items:center}
+.between{justify-content:space-between}
+.stack{display:flex;flex-direction:column;gap:12px}
+.grow{flex:1}
+.brand{display:flex;align-items:center;gap:10px;color:var(--gold);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.78rem}
+.brand svg{width:22px;height:22px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:14px 16px;font-weight:600;cursor:pointer;text-align:left;transition:transform .08s ease, background .15s}
+.btn:active{transform:scale(.985)}
+.btn:focus-visible,.chip:focus-visible,input:focus-visible,.opt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.btn.primary{background:var(--gold);color:var(--gold-ink);border-color:var(--gold);text-align:center}
+.btn.ghost{background:transparent}
+.btn.center{text-align:center}
+.btn[disabled]{opacity:.45;cursor:default}
+.tile{display:flex;gap:14px;align-items:center;padding:16px}
+.tile .ic{width:44px;height:44px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center;color:var(--gold);flex:none}
+.tile .ic svg{width:24px;height:24px}
+.tile b{display:block;font-size:1.05rem}
+.tile span{color:var(--muted);font-weight:400;font-size:.9rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 13px;font-size:.9rem;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--gold);color:var(--gold-ink);border-color:var(--gold);font-weight:600}
+.chip .n{opacity:.7;font-variant-numeric:tabular-nums;margin-left:4px}
+input[type=text]{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;font-size:1.05rem}
+input.code{text-transform:uppercase;letter-spacing:.35em;font-weight:700;text-align:center;font-size:1.6rem}
+.top{display:flex;align-items:center;gap:12px}
+.back{appearance:none;background:transparent;border:0;color:var(--muted);padding:6px 0;cursor:pointer;font-weight:600}
+.bar{height:6px;border-radius:6px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);border-radius:6px;transition:width .3s}
+.qmeta{display:flex;gap:8px;flex-wrap:wrap}
+.pill{font-size:.75rem;padding:4px 9px;border-radius:999px;background:var(--surface-2);color:var(--muted);font-weight:600}
+.pill.lv{color:var(--gold)}
+.qtext{font-family:var(--display);font-size:1.45rem;line-height:1.25;font-weight:500;text-wrap:balance}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{appearance:none;display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);padding:14px;cursor:pointer;font-weight:500;font-size:1rem}
+.opt .k{width:28px;height:28px;border-radius:8px;background:var(--surface-2);display:grid;place-items:center;font-weight:700;font-size:.85rem;flex:none;color:var(--muted)}
+.opt.sel{border-color:var(--gold)}
+.opt.sel .k{background:var(--gold);color:var(--gold-ink)}
+.opt.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 16%,var(--surface))}
+.opt.ok .k{background:var(--good);color:#06210f}
+.opt.ko{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+.opt.ko .k{background:var(--bad);color:#2a0702}
+.opt[disabled]{cursor:default}
+.feedback{border-left:4px solid var(--good);padding:12px 14px;background:var(--surface);border-radius:0 var(--r) var(--r) 0}
+.feedback.bad{border-color:var(--bad)}
+.feedback b{display:block;margin-bottom:2px}
+.big{font-family:var(--display);font-size:3.4rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.codebox{font-family:var(--display);font-size:3rem;letter-spacing:.18em;font-weight:700;color:var(--gold);text-align:center;padding:10px 0}
+.players{display:flex;flex-direction:column;gap:6px}
+.player{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;background:var(--surface-2);font-variant-numeric:tabular-nums}
+.player.me{outline:1.5px solid var(--gold)}
+.player .rk{width:26px;color:var(--muted);font-weight:700}
+.player .st{font-size:.8rem;color:var(--muted)}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:1.1rem;min-width:44px;text-align:right}
+.timer.low{color:var(--bad)}
+.statrow{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+.statrow .bar{grid-column:1 / -1}
+.tiles3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tiles3 .card{padding:12px;text-align:center}
+.tiles3 b{display:block;font-size:1.5rem;font-family:var(--display);font-variant-numeric:tabular-nums}
+.review{display:flex;flex-direction:column;gap:8px}
+.review .card{padding:12px 14px}
+.review .ans{font-size:.9rem;margin-top:4px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 20px);transform:translateX(-50%);background:var(--surface-2);border:1px solid var(--line);padding:10px 16px;border-radius:12px;font-size:.9rem;max-width:90vw}
+.modal{position:fixed;inset:0;background:rgba(5,9,22,.72);display:grid;place-items:center;padding:20px;z-index:10}
+.modal .card{max-width:400px;width:100%;display:flex;flex-direction:column;gap:14px}
+.spacer{flex:1}
+.center{text-align:center}
+.loading{display:grid;place-items:center;flex:1;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"><div class="loading">Chargement des questions…</div></main>
+
+<script>
+"use strict";
+/* ---------- data ---------- */
+let Q = [];            // [question, [4 options], correctIndex, source, level, category, subcategory]
+let CATS = [];
+const LEVELS = {"1":"Facile","2":"Moyen","3":"Difficile","4":"Expert"};
+
+/* ---------- storage (best effort) ---------- */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let progress = store.get("hq_progress", {}); // id -> [seen, correct, lastOk(0/1)]
+function record(id, ok){
+  const p = progress[id] || [0,0,0];
+  p[0]++; if(ok) p[1]++; p[2] = ok ? 1 : 0;
+  progress[id] = p; store.set("hq_progress", progress);
+}
+
+/* ---------- helpers ---------- */
+const app = document.getElementById("app");
+function h(tag, attrs, ...kids){
+  const el = document.createElement(tag);
+  if(attrs) for(const [k,v] of Object.entries(attrs)){
+    if(v === false || v == null) continue;
+    if(k === "class") el.className = v;
+    else if(k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for(const c of kids.flat()){ if(c == null || c === false) continue; el.append(c.nodeType ? c : document.createTextNode(String(c))); }
+  return el;
+}
+function svg(path){ const s = document.createElementNS("http://www.w3.org/2000/svg","svg"); s.setAttribute("viewBox","0 0 24 24"); s.setAttribute("fill","none"); s.setAttribute("stroke","currentColor"); s.setAttribute("stroke-width","1.8"); s.setAttribute("stroke-linecap","round"); s.setAttribute("stroke-linejoin","round"); s.innerHTML = path; return s; }
+const ICON = {
+  flame:'<path d="M12 3c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-7.5Z"/><path d="M6 21h12"/>',
+  solo:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.6 4-5 7-5s5.8 1.4 7 5"/>',
+  multi:'<circle cx="8" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M2.5 19c1-3 3.2-4.5 5.5-4.5s4.5 1.5 5.5 4.5"/><path d="M14 15.2c.9-.5 1.9-.7 3-.7 2 0 3.6 1.2 4.5 3.8"/>',
+  stats:'<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>',
+  redo:'<path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/>'
+};
+function render(...nodes){ app.replaceChildren(...nodes); window.scrollTo(0,0); }
+function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+function toast(msg){ const t = h("div",{class:"toast",role:"status"},msg); document.body.append(t); setTimeout(()=>t.remove(), 2600); }
+function confirmBox(text, yes, onYes){
+  const m = h("div",{class:"modal"}, h("div",{class:"card"},
+    h("p",null,text),
+    h("div",{class:"row"},
+      h("button",{class:"btn ghost center grow",onclick:()=>m.remove()},"Annuler"),
+      h("button",{class:"btn primary grow",onclick:()=>{m.remove(); onYes();}},yes))));
+  document.body.append(m);
+}
+function header(title, onBack){
+  return h("div",{class:"top"},
+    onBack ? h("button",{class:"back",onclick:onBack,"aria-label":"Retour"},"‹ Retour") : null,
+    h("div",{class:"spacer"}),
+    title ? h("span",{class:"label"},title) : null);
+}
+function chipGroup(options, value, onChange){
+  const wrap = h("div",{class:"chips",role:"group"});
+  function draw(){
+    wrap.replaceChildren(...options.map(o => h("button",{class:"chip","aria-pressed":String(o.v===value),onclick:()=>{value=o.v; draw(); onChange(o.v);}}, o.l, o.n!=null ? h("span",{class:"n"},o.n) : null)));
+  }
+  draw(); return wrap;
+}
+function pool(cat, lvl){ const out=[]; Q.forEach((q,i)=>{ if((cat==="*"||q[5]===cat) && (lvl==="*"||q[4]===lvl)) out.push(i); }); return out; }
+function countFor(cat, lvl){ return pool(cat,lvl).length; }
+
+/* ---------- home ---------- */
+function home(){
+  const answered = Object.keys(progress).length;
+  let ok = 0; for(const k in progress) ok += progress[k][2];
+  const mistakes = Object.keys(progress).filter(k => progress[k][2]===0).length;
+  render(
+    h("div",{class:"brand"}, svg(ICON.flame), "Hassidout · Histoire · Minhaguim"),
+    h("div",{class:"stack"},
+      h("h1",null,"Quiz Habad"),
+      h("p",{class:"muted"}, `${Q.length.toLocaleString("fr-FR")} questions sur les 7 Rebbeim, la philosophie, les coutumes et l'histoire de Habad.`)),
+    h("div",{class:"stack"},
+      h("button",{class:"btn tile",onclick:soloSetup},
+        h("div",{class:"ic"},svg(ICON.solo)), h("div",null,h("b",null,"Jouer en solo"),h("span",null,"Choisis un thème et un niveau"))),
+      window.claude && h("button",{class:"btn tile",onclick:multiHome},
+        h("div",{class:"ic"},svg(ICON.multi)), h("div",null,h("b",null,"Multijoueur"),h("span",null,"Crée une partie ou rejoins-la avec un code"))),
+      mistakes ? h("button",{class:"btn tile",onclick:()=>startSolo(shuffle(Object.keys(progress).filter(k=>progress[k][2]===0).map(Number)).slice(0,20),"Mes erreurs")},
+        h("div",{class:"ic"},svg(ICON.redo)), h("div",null,h("b",null,"Revoir mes erreurs"),h("span",null,`${mistakes} question${mistakes>1?"s":""} à retravailler`))) : null,
+      h("button",{class:"btn tile",onclick:statsScreen},
+        h("div",{class:"ic"},svg(ICON.stats)), h("div",null,h("b",null,"Ma progression"),h("span",null, answered ? `${answered} questions vues · ${Math.round(ok/answered*100)} % justes` : "Aucune question jouée pour l'instant")))),
+    h("div",{class:"spacer"}),
+    h("p",{class:"muted small"},"Ta progression reste enregistrée sur cet appareil. Fonctionne aussi hors connexion.")
+  );
+}
+
+/* ---------- solo ---------- */
+let soloOpts = store.get("hq_solo", {cat:"*", lvl:"*", n:10});
+function soloSetup(){
+  const countEl = h("p",{class:"muted small"});
+  const startBtn = h("button",{class:"btn primary",onclick:()=>{
+    store.set("hq_solo", soloOpts);
+    const ids = shuffle(pool(soloOpts.cat, soloOpts.lvl)).slice(0, soloOpts.n);
+    startSolo(ids, soloOpts.cat==="*" ? "Tous les thèmes" : soloOpts.cat);
+  }},"Commencer");
+  function upd(){ const c = countFor(soloOpts.cat, soloOpts.lvl); countEl.textContent = `${c} question${c>1?"s":""} disponibles avec ces choix.`; startBtn.disabled = c===0; }
+  const lvlWrap = h("div");
+  function drawLvl(){ lvlWrap.replaceChildren(chipGroup([{v:"*",l:"Tous"}, ...Object.entries(LEVELS).map(([v,l])=>({v,l,n:countFor(soloOpts.cat,v)}))], soloOpts.lvl, v=>{soloOpts.lvl=v; upd();})); }
+  render(
+    header("Solo", home),
+    h("h2",null,"Règle ta partie"),
+    h("div",{class:"stack"}, h("span",{class:"label"},"Thème"),
+      chipGroup([{v:"*",l:"Tous",n:Q.length}, ...CATS.map(c=>({v:c,l:c,n:countFor(c,"*")}))], soloOpts.cat, v=>{soloOpts.cat=v; drawLvl(); upd();})),
+    h("div",{class:"stack"}, h("span",{class:"label"},"Niveau"), lvlWrap),
+    h("div",{class:"stack"}, h("span",{class:"label"},"Nombre de questions"),
+      chipGroup([10,20,50].map(n=>({v:n,l:String(n)})), soloOpts.n, v=>{soloOpts.n=v;})),
+    countEl,
+    h("div",{class:"spacer"}),
+    startBtn
+  );
+  drawLvl(); upd();
+}
+
+function questionView(id, order, {index, total, onAnswer, locked, chosen, timerEl}){
+  const q = Q[id];
+  const opts = h("div",{class:"opts"});
+  order.forEach((oi, k) => {
+    const b = h("button",{class:"opt",onclick:()=>onAnswer && onAnswer(k, b)}, h("span",{class:"k"},"ABCD"[k]), h("span",null,q[1][oi]));
+    if(locked) b.disabled = true;
+    if(chosen === k) b.classList.add("sel");
+    opts.append(b);
+  });
+  return {
+    node: h("div",{class:"stack"},
+      h("div",{class:"row between"}, h("span",{class:"label"},`Question ${index+1} / ${total}`), timerEl || null),
+      h("div",{class:"bar"}, h("i",{style:`width:${(index/total)*100}%`})),
+      h("div",{class:"qmeta"}, h("span",{class:"pill"},q[5]), q[6] ? h("span",{class:"pill"},q[6]) : null, h("span",{class:"pill lv"},LEVELS[q[4]]||("Niveau "+q[4]))),
+      h("p",{class:"qtext"},q[0]),
+      opts),
+    opts
+  };
+}
+
+function startSolo(ids, title){
+  if(!ids.length){ toast("Aucune question pour ces choix."); return; }
+  const answers = []; let i = 0;
+  function step(){
+    const id = ids[i]; const q = Q[id];
+    const order = shuffle([0,1,2,3]);
+    const fbWrap = h("div",{class:"stack"});
+    const v = questionView(id, order, {index:i, total:ids.length, onAnswer:(k)=>{
+      [...v.opts.children].forEach((b,j)=>{ b.disabled = true; if(order[j]===q[2]) b.classList.add("ok"); });
+      const ok = order[k] === q[2];
+      if(!ok) v.opts.children[k].classList.add("ko");
+      record(id, ok); answers.push({id, ok, picked:q[1][order[k]]});
+      fbWrap.append(
+        h("div",{class:"feedback"+(ok?"":" bad")}, h("b",null, ok ? "Bonne réponse" : `La bonne réponse : ${q[1][q[2]]}`), q[3] ? h("span",{class:"muted small"},"Source : "+q[3]) : null),
+        h("button",{class:"btn primary",onclick:()=>{ i++; i<ids.length ? step() : soloEnd(); }}, i+1<ids.length ? "Question suivante" : "Voir mon score"));
+      fbWrap.lastChild.focus();
+    }});
+    render(header(title, ()=>confirmBox("Quitter la partie en cours ?","Quitter",home)), v.node, fbWrap);
+  }
+  function soloEnd(){
+    const good = answers.filter(a=>a.ok).length;
+    const pct = Math.round(good/answers.length*100);
+    render(
+      header(title, home),
+      h("div",{class:"stack"}, h("span",{class:"label"},"Ton score"), h("div",{class:"big"},`${good} / ${answers.length}`),
+        h("p",{class:"muted"}, pct>=80 ? "Excellent, tu maîtrises le sujet." : pct>=50 ? "Bien joué. Encore un peu de révision et c'est parfait." : "Continue, chaque partie te fait progresser.")),
+      h("div",{class:"row"},
+        h("button",{class:"btn primary grow",onclick:()=>startSolo(shuffle(ids),title)},"Rejouer"),
+        h("button",{class:"btn ghost center grow",onclick:home},"Accueil")),
+      answers.some(a=>!a.ok) ? h("span",{class:"label"},"À retenir") : null,
+      h("div",{class:"review"}, answers.filter(a=>!a.ok).map(a => h("div",{class:"card"},
+        h("p",null,Q[a.id][0]),
+        h("p",{class:"ans"}, h("span",{style:"color:var(--good);font-weight:600"},"✓ "+Q[a.id][1][Q[a.id][2]])),
+        h("p",{class:"ans muted"},"Ta réponse : "+a.picked))))
+    );
+  }
+  step();
+}
+
+/* ---------- stats ---------- */
+function statsScreen(){
+  const ids = Object.keys(progress);
+  let ok = 0, tries = 0; ids.forEach(k=>{ ok += progress[k][2]; tries += progress[k][0]; });
+  const rows = CATS.map(c => {
+    const total = countFor(c,"*");
+    const seen = ids.filter(k=>Q[k] && Q[k][5]===c);
+    const right = seen.filter(k=>progress[k][2]===1).length;
+    return h("div",{class:"statrow"},
+      h("span",null,c), h("span",{class:"muted small",style:"font-variant-numeric:tabular-nums"},`${right} / ${total}`),
+      h("div",{class:"bar"}, h("i",{style:`width:${total?right/total*100:0}%`})));
+  });
+  render(
+    header("Progression", home),
+    h("h2",null,"Ma progression"),
+    h("div",{class:"tiles3"},
+      h("div",{class:"card"}, h("b",null,String(ids.length)), h("span",{class:"muted small"},"vues")),
+      h("div",{class:"card"}, h("b",null, ids.length ? Math.round(ok/ids.length*100)+" %" : "–"), h("span",{class:"muted small"},"justes")),
+      h("div",{class:"card"}, h("b",null,String(tries)), h("span",{class:"muted small"},"réponses"))),
+    h("div",{class:"card stack"}, h("span",{class:"label"},"Questions maîtrisées par thème"), rows),
+    h("div",{class:"spacer"}),
+    h("button",{class:"btn ghost center",onclick:()=>confirmBox("Effacer toute ta progression sur cet appareil ?","Effacer",()=>{progress={}; store.set("hq_progress",progress); statsScreen();})},"Remettre à zéro")
+  );
+}
+
+/* ---------- multiplayer (room capability) ---------- */
+let roomNS = null;           // lobby namespace, or null
+let roomReady = false;
+let game = null;             // current multiplayer session
+let myName = store.get("hq_name", "");
+const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+function newCode(){ let s=""; for(let i=0;i<5;i++) s += CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)]; return s; }
+function cleanName(s){ return String(s||"").replace(/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁠-⁯﻿]/g,"").trim().slice(0,18); }
+
+(async()=>{ try{ roomNS = await window.claude?.use?.("room"); }catch(e){ roomNS = null; } roomReady = true; })();
+
+function multiHome(){
+  if(!roomReady){ toast("Connexion en cours, réessaie dans un instant."); return; }
+  if(!roomNS){
+    render(header("Multijoueur", home), h("h2",null,"Multijoueur indisponible ici"),
+      h("p",{class:"muted"},"Le mode multijoueur fonctionne quand le quiz est ouvert depuis Claude avec un compte connecté. Ouvre le lien du quiz dans l'app Claude ou sur claude.ai."),
+      h("div",{class:"spacer"}), h("button",{class:"btn primary",onclick:home},"Retour à l'accueil"));
+    return;
+  }
+  const nameIn = h("input",{type:"text",id:"pname",placeholder:"Ton prénom",maxlength:"18",value:myName,autocomplete:"nickname"});
+  const codeIn = h("input",{type:"text",id:"pcode",class:"code",placeholder:"CODE",maxlength:"5",autocomplete:"off",autocapitalize:"characters",spellcheck:"false"});
+  function takeName(){ const n = cleanName(nameIn.value); if(!n){ nameIn.focus(); toast("Entre ton prénom d'abord."); return null; } myName = n; store.set("hq_name", n); return n; }
+  render(
+    header("Multijoueur", home),
+    h("h2",null,"Jouer à plusieurs"),
+    h("div",{class:"stack"}, h("label",{class:"label",for:"pname"},"Ton prénom"), nameIn),
+    h("div",{class:"card stack"},
+      h("span",{class:"label"},"Rejoindre une partie"),
+      h("label",{class:"muted small",for:"pcode"},"Entre le code que l'hôte t'a donné."),
+      codeIn,
+      h("button",{class:"btn primary",onclick:()=>{
+        if(!takeName()) return;
+        const c = codeIn.value.toUpperCase().replace(/[^A-Z0-9]/g,"");
+        if(c.length!==5){ codeIn.focus(); toast("Le code fait 5 caractères."); return; }
+        joinGame(c, false);
+      }},"Rejoindre")),
+    h("div",{class:"card stack"},
+      h("span",{class:"label"},"Créer une partie"),
+      h("p",{class:"muted small"},"Tu obtiens un code à partager. Tu joues aussi."),
+      h("button",{class:"btn center",onclick:()=>{ if(takeName()) hostSetup(); }},"Créer une partie")),
+    h("p",{class:"muted small"},"Chaque joueur doit ouvrir ce quiz depuis Claude, avec un compte qui a accès au lien.")
+  );
+}
+
+let hostOpts = store.get("hq_host", {cat:"*", lvl:"*", n:10, t:20});
+function hostSetup(){
+  const countEl = h("p",{class:"muted small"});
+  const go = h("button",{class:"btn primary",onclick:()=>{ store.set("hq_host",hostOpts); joinGame(newCode(), true); }},"Créer la partie");
+  function upd(){ const c = countFor(hostOpts.cat, hostOpts.lvl); countEl.textContent = `${c} questions disponibles.`; go.disabled = c===0; }
+  const lvlWrap = h("div");
+  function drawLvl(){ lvlWrap.replaceChildren(chipGroup([{v:"*",l:"Tous"}, ...Object.entries(LEVELS).map(([v,l])=>({v,l,n:countFor(hostOpts.cat,v)}))], hostOpts.lvl, v=>{hostOpts.lvl=v; upd();})); }
+  render(
+    header("Nouvelle partie", multiHome),
+    h("h2",null,"Règle la partie"),
+    h("div",{class:"stack"}, h("span",{class:"label"},"Thème"),
+      chipGroup([{v:"*",l:"Tous"}, ...CATS.map(c=>({v:c,l:c}))], hostOpts.cat, v=>{hostOpts.cat=v; drawLvl(); upd();})),
+    h("div",{class:"stack"}, h("span",{class:"label"},"Niveau"), lvlWrap),
+    h("div",{class:"stack"}, h("span",{class:"label"},"Questions"), chipGroup([5,10,15,20].map(n=>({v:n,l:String(n)})), hostOpts.n, v=>{hostOpts.n=v;})),
+    h("div",{class:"stack"}, h("span",{class:"label"},"Temps par question"), chipGroup([10,20,30].map(n=>({v:n,l:n+" s"})), hostOpts.t, v=>{hostOpts.t=v;})),
+    countEl, h("div",{class:"spacer"}), go
+  );
+  drawLvl(); upd();
+}
+
+async function joinGame(code, isHost){
+  render(h("div",{class:"loading"},"Connexion à la partie…"));
+  let r;
+  try{ r = await roomNS.join("hq-" + code.toLowerCase()); }
+  catch(e){ render(header("Multijoueur", multiHome), h("h2",null,"Connexion impossible"), h("p",{class:"muted"},"La partie n'a pas pu être rejointe. Vérifie ta connexion et réessaie."), h("button",{class:"btn primary",onclick:multiHome},"Réessayer")); return; }
+  game = {code, isHost, r, unsubs:[], st:null, hostPeer:null, myPeer:null, myAns:null, shownAt:0, shownIdx:-1, ended:false};
+  const me = { r: isHost ? "h" : "p", nm: myName };
+  await r.presence(me).catch(()=>{});
+  game.unsubs.push(r.onPeers(ch => onPeersChange(ch.peers), ()=>{ if(!game.ended) lostRoom(); }));
+  if(isHost) hostInit(); else waitHost();
+}
+function leaveGame(){
+  if(!game) return;
+  game.ended = true;
+  clearInterval(game.tick);
+  clearTimeout(game.waitT);
+  game.unsubs.forEach(u=>{ try{u();}catch(e){} });
+  game.r.leave().catch(()=>{});
+  game = null;
+}
+function lostRoom(){ leaveGame(); render(header("Multijoueur", multiHome), h("h2",null,"Connexion perdue"), h("p",{class:"muted"},"La connexion à la partie s'est interrompue."), h("button",{class:"btn primary",onclick:multiHome},"Retour")); }
+function quitBtn(){ return header(game ? "Code " + game.code : "", ()=>confirmBox("Quitter la partie ?","Quitter",()=>{ leaveGame(); multiHome(); })); }
+
+function onPeersChange(peers){
+  if(!game) return;
+  const mine = peers.find(p=>p.sameTab); if(mine) game.myPeer = mine.peer;
+  if(game.isHost){ hostOnPeers(peers); return; }
+  const host = peers.find(p => p.presence && p.presence.r==="h" && !p.sameTab);
+  if(!host){ if(game.hostPeer){ hostGone(); } return; }
+  game.hostPeer = host.peer;
+  const st = host.presence.st;
+  if(st && (!game.st || st.v !== game.st.v)){ game.st = st; playerRender(); }
+}
+function waitHost(){
+  render(quitBtn(), h("h2",null,"Recherche de la partie…"), h("p",{class:"muted"},`Code ${game.code}. Si rien ne se passe, vérifie le code avec l'hôte.`));
+  game.waitT = setTimeout(()=>{ if(game && !game.hostPeer) render(quitBtn(), h("h2",null,"Aucune partie trouvée"), h("p",{class:"muted"},`Personne n'héberge la partie ${game.code} en ce moment. Vérifie le code, ou demande à l'hôte de laisser le quiz ouvert.`), h("p",{class:"muted small"},"Tu restes en attente : la partie s'affichera dès que l'hôte sera là.")); }, 6000);
+}
+function hostGone(){
+  const code = game.code; leaveGame();
+  render(header("Multijoueur", multiHome), h("h2",null,"L'hôte a quitté la partie"), h("p",{class:"muted"},`La partie ${code} est terminée.`), h("button",{class:"btn primary",onclick:multiHome},"Retour"));
+}
+
+/* ----- host engine ----- */
+function hostInit(){
+  const g = game;
+  g.players = {};      // peer -> {nm, s, ans:{} }
+  g.ids = shuffle(pool(hostOpts.cat, hostOpts.lvl)).slice(0, hostOpts.n);
+  g.time = hostOpts.t;
+  g.cat = hostOpts.cat === "*" ? "Tous les thèmes" : hostOpts.cat;
+  g.phase = "lobby"; g.i = -1; g.v = 0; g.order = null; g.deadline = 0; g.revealUntil = 0;
+  g.tick = setInterval(hostTick, 250);
+  hostPublish();
+}
+function hostOnPeers(peers){
+  const g = game;
+  for(const p of peers){
+    if(p.sameTab){ g.myPeer = p.peer; }
+    const pr = p.presence || {};
+    const isPlayer = p.sameTab || pr.r === "p";
+    if(!isPlayer) continue;
+    if(!g.players[p.peer]) g.players[p.peer] = {nm: p.sameTab ? myName : (cleanName(pr.nm) || "Joueur"), s:0, ans:{}, on:true};
+    const pl = g.players[p.peer];
+    pl.on = true;
+    if(!p.sameTab){ pl.nm = cleanName(pr.nm) || pl.nm; }
+    const a = pr.a;
+    if(!p.sameTab && a && g.phase==="q" && a.i===g.i && pl.ans[g.i]==null && Number.isInteger(a.c) && a.c>=0 && a.c<4){
+      hostScore(pl, a.c, Number(a.ms)||g.time*1000);
+    }
+  }
+  const here = new Set(peers.map(p=>p.peer));
+  for(const k in g.players) g.players[k].on = here.has(k);
+  // publish only when players or answers changed (our own presence updates also land here)
+  const sig = JSON.stringify(Object.entries(g.players).map(([k,p])=>[k,p.nm,p.on,p.s,Object.keys(p.ans).length]));
+  if(sig !== g.sig){ g.sig = sig; hostPublish(); }
+}
+function hostScore(pl, c, ms){
+  const g = game;
+  const q = Q[g.ids[g.i]];
+  const ok = g.order[c] === q[2];
+  ms = Math.max(0, Math.min(ms, g.time*1000));
+  const pts = ok ? Math.round(1000 - 500*(ms/(g.time*1000))) : 0;
+  pl.ans[g.i] = {c, ok, pts}; pl.s += pts;
+}
+function hostAnswer(k){ // the host plays too
+  const g = game; if(!g || g.phase!=="q") return;
+  const pl = g.players[g.myPeer] || (g.players[g.myPeer] = {nm:myName, s:0, ans:{}, on:true});
+  if(pl.ans[g.i]!=null) return;
+  hostScore(pl, k, Date.now() - g.qStart);
+  record(g.ids[g.i], pl.ans[g.i].ok);
+  hostPublish();
+}
+function hostStart(){
+  const g = game; if(!g.ids.length) return;
+  for(const k in g.players){ g.players[k].s = 0; g.players[k].ans = {}; }
+  hostNext(0);
+}
+function hostNext(i){
+  const g = game;
+  g.i = i; g.phase = "q"; g.order = shuffle([0,1,2,3]);
+  g.qStart = Date.now(); g.deadline = g.qStart + g.time*1000;
+  hostPublish();
+}
+function hostTick(){
+  const g = game; if(!g || !g.isHost) return;
+  const now = Date.now();
+  if(g.phase === "q"){
+    const active = Object.values(g.players).filter(p=>p.on);
+    const allIn = active.length>0 && active.every(p=>p.ans[g.i]!=null);
+    if(now >= g.deadline || allIn){ g.phase = "rv"; g.revealUntil = now + 5000; hostPublish(); return; }
+    const rem = Math.ceil((g.deadline-now)/1000);
+    if(rem !== g.lastRem){ g.lastRem = rem; hostPublish(); }
+  } else if(g.phase === "rv" && now >= g.revealUntil){
+    if(g.i+1 < g.ids.length) hostNext(g.i+1); else { g.phase = "end"; hostPublish(); }
+  }
+}
+function hostState(){
+  const g = game;
+  const sc = Object.entries(g.players).filter(([k,p])=>p.on || p.s>0)
+    .map(([k,p])=>[k, p.nm, p.s, g.phase==="q" ? (p.ans[g.i]!=null?1:0) : (p.ans[g.i] ? (p.ans[g.i].ok?1:0) : -1)])
+    .sort((a,b)=>b[2]-a[2]).slice(0,30);
+  const st = {v:++g.v, ph:g.phase, i:g.i, n:g.ids.length, t:g.time, cat:g.cat, sc};
+  if(g.phase==="q" || g.phase==="rv"){
+    const q = Q[g.ids[g.i]];
+    st.q = {id:g.ids[g.i], o:g.order};
+    st.rem = Math.max(0, Math.ceil((g.deadline-Date.now())/1000));
+    if(g.phase==="rv") st.c = g.order.indexOf(q[2]);
+  }
+  return st;
+}
+function hostPublish(){
+  const g = game; if(!g || g.ended) return;
+  const st = hostState();
+  // keep presence under 4 KiB: shrink the scoreboard if needed
+  while(JSON.stringify(st).length > 3600 && st.sc.length > 3) st.sc.pop();
+  g.st = st;
+  g.r.presence({r:"h", nm:myName, st}).catch(()=>{});
+  playerRender();
+}
+
+/* ----- shared rendering for host & players ----- */
+function scoreboard(sc, phase){
+  return h("div",{class:"players"}, sc.map(([peer,nm,s,flag],idx)=> h("div",{class:"player"+(peer===game.myPeer?" me":"")},
+    h("div",{class:"row"}, h("span",{class:"rk"}, String(idx+1)), h("span",null, nm + (peer===game.myPeer?" (toi)":""))),
+    h("div",{class:"row"},
+      phase==="q" ? h("span",{class:"st"}, flag ? "a répondu" : "réfléchit…") :
+      phase==="rv" ? h("span",{class:"st",style:`color:${flag===1?"var(--good)":flag===0?"var(--bad)":"var(--muted)"}`}, flag===1?"juste":flag===0?"faux":"pas de réponse") : null,
+      h("b",null, s.toLocaleString("fr-FR"))))));
+}
+function playerRender(){
+  const g = game; if(!g) return;
+  const st = g.st; if(!st) return;
+  clearTimeout(g.waitT);
+  // remember when this player first saw the current question
+  if(st.ph==="q" && g.shownIdx !== st.i){ g.shownIdx = st.i; g.shownAt = Date.now(); g.myAns = null; if(!g.isHost) g.r.presence({a:null}).catch(()=>{}); }
+  if(st.ph === "lobby"){ g.shownIdx = -1; g.recorded = -1; g.myAns = null; return lobbyView(st); }
+  if(st.ph === "end") return endView(st);
+  const id = st.q.id; const q = Q[id]; if(!q) return;
+  const mineHost = g.isHost ? (g.players[g.myPeer]||{ans:{}}).ans[st.i] : null;
+  const chosen = g.isHost ? (mineHost ? mineHost.c : null) : g.myAns;
+  const timer = h("span",{class:"timer"+(st.rem<=5?" low":"")}, st.ph==="q" ? st.rem+" s" : "");
+  const v = questionView(id, st.q.o, {index:st.i, total:st.n, timerEl:timer, chosen, locked: st.ph!=="q" || chosen!=null,
+    onAnswer:(k)=>{
+      if(g.isHost){ hostAnswer(k); return; }
+      if(g.myAns!=null || g.st.ph!=="q") return;
+      g.myAns = k;
+      g.r.presence({a:{i:st.i, c:k, ms:Date.now()-g.shownAt}}).catch(()=>{});
+      playerRender();
+    }});
+  if(st.ph === "rv"){
+    [...v.opts.children].forEach((b,j)=>{ if(j===st.c) b.classList.add("ok"); else if(j===chosen) b.classList.add("ko"); });
+    if(!g.isHost && g.recorded !== st.i && chosen!=null){ g.recorded = st.i; record(id, chosen===st.c); }
+  }
+  const info = st.ph==="rv"
+    ? h("div",{class:"feedback"+(chosen===st.c?"":" bad")}, h("b",null, chosen==null ? `Temps écoulé. Réponse : ${q[1][q[2]]}` : chosen===st.c ? "Bonne réponse" : `La bonne réponse : ${q[1][q[2]]}`), q[3] ? h("span",{class:"muted small"},"Source : "+q[3]) : null)
+    : chosen!=null ? h("p",{class:"muted small"},"Réponse envoyée. On attend les autres…") : null;
+  render(quitBtn(), v.node, info, h("span",{class:"label"}, st.ph==="rv" ? "Classement" : "Joueurs"), scoreboard(st.sc, st.ph));
+}
+function lobbyView(st){
+  const g = game;
+  const canStart = g.isHost && st.sc.length >= 1;
+  render(
+    quitBtn(),
+    h("div",{class:"card stack",style:"text-align:center"},
+      h("span",{class:"label"}, g.isHost ? "Code à partager" : "Tu es dans la partie"),
+      h("div",{class:"codebox"}, g.code),
+      g.isHost ? h("button",{class:"btn ghost center",onclick:()=>{ navigator.clipboard?.writeText(g.code).then(()=>toast("Code copié"),()=>toast("Copie impossible, dicte le code.")); }},"Copier le code") : null),
+    h("p",{class:"muted"}, `${st.cat} · ${st.n} questions · ${st.t} s par question`),
+    h("span",{class:"label"}, `Joueurs (${st.sc.length})`),
+    scoreboard(st.sc, "lobby"),
+    h("div",{class:"spacer"}),
+    g.isHost
+      ? h("button",{class:"btn primary",disabled:!canStart,onclick:hostStart},"Lancer la partie")
+      : h("p",{class:"muted center"},"En attente du lancement par l'hôte…")
+  );
+}
+function endView(st){
+  const g = game;
+  const winner = st.sc[0];
+  const myRank = st.sc.findIndex(s=>s[0]===g.myPeer);
+  render(
+    quitBtn(),
+    h("div",{class:"stack"},
+      h("span",{class:"label"},"Partie terminée"),
+      h("h2",null, winner ? `${winner[1]} gagne avec ${winner[2].toLocaleString("fr-FR")} points` : "Partie terminée"),
+      myRank>=0 ? h("p",{class:"muted"}, `Tu finis ${myRank===0?"1er":(myRank+1)+"e"} sur ${st.sc.length}.`) : null),
+    scoreboard(st.sc, "end"),
+    h("div",{class:"spacer"}),
+    g.isHost
+      ? h("div",{class:"row"},
+          h("button",{class:"btn primary grow",onclick:()=>{ g.ids = shuffle(pool(hostOpts.cat, hostOpts.lvl)).slice(0, hostOpts.n); g.phase="lobby"; g.i=-1; for(const k in g.players){ g.players[k].s=0; g.players[k].ans={}; } hostPublish(); }},"Nouvelle manche"),
+          h("button",{class:"btn ghost center grow",onclick:()=>{ leaveGame(); home(); }},"Terminer"))
+      : h("button",{class:"btn ghost center",onclick:()=>{ leaveGame(); home(); }},"Retour à l'accueil")
+  );
+}
+
+/* ---------- boot ---------- */
+if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js").catch(()=>{}); }catch(e){} }
+fetch("questions.json").then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(data=>{
+  Q = data;
+  const order = ["Les 7 Rebbeim","Philosophie & Textes","Minhaguim & Coutumes","Histoire & Dates","Histoire & Lieux","Mivtsaim & Campagnes","Institutions & Rayonnement","Nigounim & Figures"];
+  const seen = [...new Set(Q.map(q=>q[5]))];
+  CATS = order.filter(c=>seen.includes(c)).concat(seen.filter(c=>!order.includes(c)));
+  home();
+}).catch(()=>{
+  render(h("h2",null,"Les questions n'ont pas pu être chargées"), h("p",{class:"muted"},"Vérifie ta connexion puis recharge la page."), h("button",{class:"btn primary",onclick:()=>location.reload()},"Recharger"));
+});
+</script>
+</body>
+</html>
