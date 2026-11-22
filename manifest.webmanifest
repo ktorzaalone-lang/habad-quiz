@@ -1,12 +1,12 @@
 {
-  "name": "Habad Quiz",
-  "short_name": "Habad Quiz",
+  "name": "770 Habad Quiz",
+  "short_name": "770 Quiz",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#0d1630",
+  "background_color": "#110d09",
+  "theme_color": "#110d09",
   "icons": [
     {
       "src": "apple-touch-icon.png",
