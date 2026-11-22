@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>770 Habad Quiz</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* 770 Habad Quiz — fond nuit chaude, or du logo, la façade du 770 dessinée en bas de l'écran. Une colonne centrée (max 560px). */
+/* 770 Habad Quiz — fond sombre chaud, accents or. Une colonne centrée (max 560px), écrans remplacés sur place avec un léger fondu. */
 :root{
   color-scheme: dark;
   --bg:#110d09;
@@ -38,12 +38,8 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{background:radial-gradient(120% 70% at 50% 105%, #3a2712 0%, #1a130c 45%, var(--bg) 75%) fixed, var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+body{background:radial-gradient(90% 50% at 50% 0%, #22190f 0%, var(--bg) 70%) fixed, var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
 button,input,select{font:inherit;color:inherit}
-.bg770{position:fixed;left:50%;bottom:-6px;transform:translateX(-50%);width:min(760px,150vw);pointer-events:none;opacity:.13;transition:opacity .4s;z-index:0}
-body.home .bg770{opacity:.36}
-.bg770 svg{display:block;width:100%;height:auto}
-body.play .bg770{opacity:.08}
 #app{position:relative;z-index:1;max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
   padding:calc(env(safe-area-inset-top) + 18px) calc(env(safe-area-inset-right) + 18px) calc(env(safe-area-inset-bottom) + 22px) calc(env(safe-area-inset-left) + 18px);gap:16px}
 h1,h2{font-family:var(--display);font-weight:900;text-wrap:balance;margin:0;letter-spacing:-.01em}
@@ -108,7 +104,7 @@ input.code{text-transform:uppercase;letter-spacing:.35em;font-weight:700;text-al
 .theme{appearance:none;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;min-height:64px;display:flex;flex-direction:column;justify-content:space-between;gap:4px}
 .theme b{font-size:.95rem;line-height:1.2}
 .theme span{font-size:.78rem;color:var(--muted)}
-.theme.all{grid-column:1 / -1;min-height:auto;flex-direction:row;align-items:center;justify-content:space-between}
+.theme.all{grid-column:1 / -1;min-height:auto}
 .theme[aria-pressed="true"]{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 14%,var(--surface))}
 .theme[disabled]{opacity:.35;cursor:default}
 .sticky{position:sticky;bottom:calc(env(safe-area-inset-bottom) + 10px);z-index:2;display:flex;flex-direction:column}
@@ -153,50 +149,39 @@ input.code{text-transform:uppercase;letter-spacing:.35em;font-weight:700;text-al
 .modal{position:fixed;inset:0;background:rgba(10,7,4,.75);display:grid;place-items:center;padding:20px;z-index:10}
 .modal .card{max-width:400px;width:100%;display:flex;flex-direction:column;gap:14px;background:#211a13}
 .spacer{flex:1}
+.brand{display:flex;align-items:center;gap:10px;color:var(--gold);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.76rem}
+.brand svg{width:20px;height:20px}
+.title-block{display:flex;flex-direction:column;gap:10px}
+.title-block h1 .n{color:var(--gold)}
+.tile .chev{margin-left:auto;color:var(--muted);flex:none}
+.tile .chev svg{width:18px;height:18px}
+.tile.main{border-color:color-mix(in srgb,var(--gold) 55%,var(--line))}
+.tile.main .ic{background:var(--gold);color:var(--gold-ink)}
+.steps{display:flex;gap:6px}
+.steps i{flex:1;height:4px;border-radius:4px;background:var(--surface-2)}
+.steps i.on{background:var(--gold)}
+.prog{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.prog .bar{height:4px}
+.prog .bar i{background:var(--c,var(--gold))}
+.prog small{font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.lvl .body{flex:1;min-width:0}
+.lvl .tag{font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c);margin-left:8px;vertical-align:2px}
+.theme .prog{margin-top:6px}
+.summary{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:.9rem}
+.summary dt{color:var(--muted)}
+.summary dd{margin:0;font-weight:600}
+@keyframes enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#app.enter > *{animation:enter .28s ease both}
+#app.enter > *:nth-child(2){animation-delay:.03s}
+#app.enter > *:nth-child(3){animation-delay:.06s}
+#app.enter > *:nth-child(4){animation-delay:.09s}
+#app.enter > *:nth-child(n+5){animation-delay:.12s}
 .center{text-align:center}
 .loading{display:grid;place-items:center;flex:1;color:var(--muted)}
-@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<div class="bg770" aria-hidden="true"><svg role="presentation" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 230" fill="none" stroke="#e0b25a" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
-  <g fill="#f3c76b" stroke="none" opacity=".55">
-    <rect x="58" y="108" width="12" height="18" rx="1"/><rect x="107" y="146" width="12" height="18" rx="1"/>
-    <rect x="164" y="108" width="12" height="18" rx="1"/><rect x="224" y="146" width="12" height="18" rx="1"/>
-    <rect x="281" y="108" width="12" height="18" rx="1"/><rect x="330" y="108" width="12" height="18" rx="1"/>
-    <rect x="306" y="183" width="12" height="18" rx="1"/><rect x="82" y="183" width="12" height="18" rx="1"/>
-    <path d="M186 90V66a4 4 0 0 1 8 0v24z M206 90V66a4 4 0 0 1 8 0v24z"/>
-    <path d="M188 214v-34a12 12 0 0 1 24 0v34z" opacity=".5"/>
-  </g>
-  <!-- facade -->
-  <path d="M40 214V98h20l35-38 35 38h40l30-58 30 58h40l35-38 35 38h20v116"/>
-  <path d="M30 98h340"/>
-  <path d="M95 60v-6 M200 40v-8 M305 60v-6"/>
-  <!-- cornices / floors -->
-  <path d="M40 136h320 M40 173h320" opacity=".55"/>
-  <!-- gable windows -->
-  <circle cx="95" cy="80" r="7"/><circle cx="305" cy="80" r="7"/>
-  <path d="M186 90V66a4 4 0 0 1 8 0v24 M196 90V62a4 4 0 0 1 8 0v28 M206 90V66a4 4 0 0 1 8 0v24"/>
-  <!-- windows rows -->
-  <g>
-    <rect x="58" y="108" width="12" height="18" rx="1"/><rect x="82" y="108" width="12" height="18" rx="1"/><rect x="107" y="108" width="12" height="18" rx="1"/><rect x="131" y="108" width="12" height="18" rx="1"/>
-    <rect x="164" y="108" width="12" height="18" rx="1"/><rect x="224" y="108" width="12" height="18" rx="1"/>
-    <rect x="257" y="108" width="12" height="18" rx="1"/><rect x="281" y="108" width="12" height="18" rx="1"/><rect x="306" y="108" width="12" height="18" rx="1"/><rect x="330" y="108" width="12" height="18" rx="1"/>
-    <rect x="58" y="146" width="12" height="18" rx="1"/><rect x="82" y="146" width="12" height="18" rx="1"/><rect x="107" y="146" width="12" height="18" rx="1"/><rect x="131" y="146" width="12" height="18" rx="1"/>
-    <rect x="164" y="146" width="12" height="18" rx="1"/><rect x="224" y="146" width="12" height="18" rx="1"/>
-    <rect x="257" y="146" width="12" height="18" rx="1"/><rect x="281" y="146" width="12" height="18" rx="1"/><rect x="306" y="146" width="12" height="18" rx="1"/><rect x="330" y="146" width="12" height="18" rx="1"/>
-    <rect x="58" y="183" width="12" height="18" rx="1"/><rect x="82" y="183" width="12" height="18" rx="1"/><rect x="107" y="183" width="12" height="18" rx="1"/><rect x="131" y="183" width="12" height="18" rx="1"/>
-    <rect x="257" y="183" width="12" height="18" rx="1"/><rect x="281" y="183" width="12" height="18" rx="1"/><rect x="306" y="183" width="12" height="18" rx="1"/><rect x="330" y="183" width="12" height="18" rx="1"/>
-  </g>
-  <!-- central entrance -->
-  <path d="M182 214v-34a18 18 0 0 1 36 0v34"/>
-  <path d="M188 214v-34a12 12 0 0 1 24 0v34"/>
-  <path d="M200 168v46" opacity=".6"/>
-  <path d="M162 214v-30h12v30 M226 214v-30h12v30" opacity=".6"/>
-  <text x="200" y="126" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="700" fill="#e0b25a" stroke="none" letter-spacing="2">770</text>
-  <!-- steps & ground -->
-  <path d="M176 218h48 M170 222h60 M10 214h380"/>
-</svg></div>
 <main id="app" aria-live="polite"><div class="loading">Chargement des questions…</div></main>
 
 <script>
@@ -206,10 +191,10 @@ let Q = [];            // [question, [4 options], correctIndex, source, level, c
 let CATS = [];
 const LEVELS = {"1":"Facile","2":"Moyen","3":"Difficile","4":"Expert"};
 const LEVEL_INFO = {
-  "1":{d:"Pour bien commencer", c:"var(--l1)"},
-  "2":{d:"Tu connais déjà pas mal de choses", c:"var(--l2)"},
-  "3":{d:"Pour ceux qui ont bien révisé", c:"var(--l3)"},
-  "4":{d:"Que pour les vrais pros", c:"var(--l4)"}
+  "1":{d:"Les notions essentielles", c:"var(--l1)"},
+  "2":{d:"Connaissances générales approfondies", c:"var(--l2)"},
+  "3":{d:"Questions pointues et détaillées", c:"var(--l3)"},
+  "4":{d:"Réservé aux connaisseurs confirmés", c:"var(--l4)"}
 };
 
 /* ---------- storage (best effort) ---------- */
@@ -243,9 +228,10 @@ const ICON = {
   solo:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.6 4-5 7-5s5.8 1.4 7 5"/>',
   multi:'<circle cx="8" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M2.5 19c1-3 3.2-4.5 5.5-4.5s4.5 1.5 5.5 4.5"/><path d="M14 15.2c.9-.5 1.9-.7 3-.7 2 0 3.6 1.2 4.5 3.8"/>',
   stats:'<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>',
-  redo:'<path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/>'
+  redo:'<path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/>',
+  chev:'<path d="M9 6l6 6-6 6"/>'
 };
-function render(...nodes){ app.replaceChildren(...nodes); window.scrollTo(0,0); document.body.classList.toggle("play", !!app.querySelector(".qtext")); document.body.classList.toggle("home", !!app.querySelector(".hero")); }
+function render(...nodes){ app.classList.remove("enter"); app.replaceChildren(...nodes); window.scrollTo(0,0); void app.offsetWidth; app.classList.add("enter"); }
 function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
 function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
 function toast(msg){ const t = h("div",{class:"toast",role:"status"},msg); document.body.append(t); setTimeout(()=>t.remove(), 2600); }
@@ -274,59 +260,70 @@ function pool(cat, lvl){ const out=[]; Q.forEach((q,i)=>{ if((cat==="*"||q[5]===
 function countFor(cat, lvl){ return pool(cat,lvl).length; }
 
 /* ---------- home ---------- */
+function tile(icon, title, sub, onclick, extra){
+  return h("button",{class:"btn tile"+(extra||""),onclick}, h("div",{class:"ic"},svg(icon)), h("div",null,h("b",null,title),h("span",null,sub)), h("div",{class:"chev"},svg(ICON.chev)));
+}
 function home(){
   const answered = Object.keys(progress).length;
   let ok = 0; for(const k in progress) ok += progress[k][2];
   const mistakes = Object.keys(progress).filter(k => progress[k][2]===0).length;
   render(
-    h("div",{class:"hero"},
-      h("img",{class:"logo",src:"apple-touch-icon.png",alt:"Logo 770 Habad Quiz",width:"104",height:"104"}),
-      h("h1",null,h("span",{class:"n"},"770"),"Habad Quiz"),
+    h("div",{class:"brand"}, svg(ICON.flame), "Hassidout · Histoire · Minhaguim"),
+    h("div",{class:"title-block"},
+      h("h1",null,h("span",{class:"n"},"770 "),"Habad Quiz"),
       h("p",{class:"muted"}, `${Q.length.toLocaleString("fr-FR")} questions sur les Rabbeim, la 'hassidout, les coutumes et l'histoire de Habad.`)),
-    h("button",{class:"btn primary lg",onclick:()=>soloSetup()}, "Jouer"),
-    h("button",{class:"btn tile",onclick:multiHome},
-      h("div",{class:"ic"},svg(ICON.multi)), h("div",null,h("b",null,"Jouer avec des potes"),h("span",null,"Crée une partie ou entre un code"))),
-    h("div",{class:"duo"},
-      h("button",{class:"btn",onclick:statsScreen}, h("b",null,"Mes stats"), h("span",null, answered ? `${Math.round(ok/answered*100)} % de bonnes réponses` : "Pas encore joué")),
-      h("button",{class:"btn",disabled:!mistakes,onclick:()=>startSolo(shuffle(Object.keys(progress).filter(k=>progress[k][2]===0).map(Number)).slice(0,20),"Mes erreurs")},
-        h("b",null,"Mes erreurs"), h("span",null, mistakes ? `${mistakes} à revoir` : "Aucune pour l'instant"))),
-    h("div",{class:"spacer"})
+    h("div",{class:"stack"},
+      tile(ICON.solo, "Jouer en solo", "Choisissez un niveau, puis un thème", ()=>soloSetup(), " main"),
+      tile(ICON.multi, "Mode multijoueur", "Créer un salon ou rejoindre une partie avec un code", multiHome),
+      mistakes ? tile(ICON.redo, "Revoir mes erreurs", `${mistakes} question${mistakes>1?"s":""} à retravailler`, ()=>startSolo(shuffle(Object.keys(progress).filter(k=>progress[k][2]===0).map(Number)).slice(0,20),"Mes erreurs")) : null,
+      tile(ICON.stats, "Ma progression", answered ? `${answered} questions vues · ${Math.round(ok/answered*100)} % de réussite` : "Aucune question jouée pour l'instant", statsScreen)),
+    h("div",{class:"spacer"}),
+    h("p",{class:"muted small"},"Votre progression est enregistrée sur cet appareil. L'application fonctionne également hors connexion.")
   );
 }
 
-/* ---------- choix du niveau puis du thème (solo et multi) ---------- */
+/* ---------- choix du niveau puis du thème (solo et multijoueur) ---------- */
+function mastered(cat, lvl){ let m=0; for(const i of pool(cat,lvl)){ const p=progress[i]; if(p && p[2]===1) m++; } return m; }
+function progBar(m, n, c, compact){
+  const pct = n ? Math.round(m/n*100) : 0;
+  const txt = compact ? (m ? `${m} / ${n} · ${pct} %` : `${n} question${n>1?"s":""}`) : (m ? `${m} / ${n} maîtrisées · ${pct} %` : `${n} question${n>1?"s":""} · non commencé`);
+  return h("div",{class:"prog",style:c?`--c:${c}`:null}, h("div",{class:"bar"},h("i",{style:`width:${pct}%`})), h("small",null, txt));
+}
+function steps(k){ return h("div",{class:"steps","aria-label":`Étape ${k} sur 2`}, h("i",{class:"on"}), h("i",{class:k>1?"on":""})); }
 function bars(lv){ const w = h("div",{class:"bars"}); for(let i=1;i<=4;i++) w.append(h("i",{class: lv==="*" || i<=Number(lv) ? "f" : ""})); return w; }
 function levelScreen(opts, {title, onBack, onPick}){
   const items = [...Object.keys(LEVELS).map(v=>({v, name:LEVELS[v], d:LEVEL_INFO[v].d, c:LEVEL_INFO[v].c})),
-    {v:"*", name:"Tout mélanger", d:"Un peu de chaque niveau", c:"var(--gold)"}];
+    {v:"*", name:"Tous niveaux", d:"Questions de tous les niveaux, mélangées", c:"var(--gold)"}];
   render(
     header(title, onBack),
-    h("div",{class:"stack"}, h("span",{class:"step"},"Étape 1 sur 2"), h("h2",null,"Choisis ton niveau")),
+    h("div",{class:"stack"}, steps(1), h("span",{class:"step"},"Étape 1 sur 2 · Niveau"), h("h2",null,"Sélectionnez un niveau")),
     h("div",{class:"lvls"}, items.map(it=>{
-      const n = countFor("*", it.v);
+      const n = countFor("*", it.v), m = mastered("*", it.v);
+      const done = n && m===n;
       return h("button",{class:"lvl"+(opts.lvl===it.v?" on":""),style:`--c:${it.c}`,disabled:n===0,onclick:()=>{ opts.lvl = it.v; if(opts.cat!=="*" && countFor(opts.cat,it.v)===0) opts.cat="*"; onPick(); }},
-        bars(it.v), h("div",null,h("b",null,it.name),h("span",null,it.d)), h("div",{class:"cnt"}, String(n), h("br"), "questions"));
+        bars(it.v),
+        h("div",{class:"body"}, h("b",null,it.name, opts.lvl===it.v ? h("span",{class:"tag"},"Dernier choix") : done ? h("span",{class:"tag"},"Terminé") : null), h("span",null,it.d), progBar(m, n, it.c)));
     }))
   );
 }
 function themeScreen(opts, {title, onBack, extra, goLabel, onGo}){
-  const lvName = opts.lvl==="*" ? "Tous les niveaux" : LEVELS[opts.lvl];
+  const lvName = opts.lvl==="*" ? "Tous niveaux" : LEVELS[opts.lvl];
   const lvColor = opts.lvl==="*" ? "var(--gold)" : LEVEL_INFO[opts.lvl].c;
   const go = h("button",{class:"btn primary lg",onclick:onGo}, goLabel);
   const grid = h("div",{class:"themes"});
   function draw(){
     const list = [{v:"*", l:"Tous les thèmes"}, ...CATS.map(c=>({v:c,l:c}))];
     grid.replaceChildren(...list.map(t=>{
-      const n = countFor(t.v, opts.lvl);
+      const n = countFor(t.v, opts.lvl), m = mastered(t.v, opts.lvl);
       return h("button",{class:"theme"+(t.v==="*"?" all":""),"aria-pressed":String(opts.cat===t.v),disabled:n===0,onclick:()=>{opts.cat=t.v; draw();}},
-        h("b",null,t.l), h("span",null, `${n} question${n>1?"s":""}`));
+        h("div",null,h("b",null,t.l), progBar(m, n, null, t.v!=="*")));
     }));
     go.disabled = countFor(opts.cat, opts.lvl)===0;
   }
   render(
     header(title, onBack),
-    h("div",{class:"stack"}, h("span",{class:"step"},"Étape 2 sur 2"), h("h2",null,"Choisis un thème")),
-    h("div",{class:"card pickd",style:`--c:${lvColor}`}, h("span",{class:"dot"}), h("span",null,"Niveau : ", h("b",null,lvName)), h("button",{onclick:onBack},"Changer")),
+    h("div",{class:"stack"}, steps(2), h("span",{class:"step"},"Étape 2 sur 2 · Thème"), h("h2",null,"Sélectionnez un thème")),
+    h("div",{class:"card pickd",style:`--c:${lvColor}`}, h("span",{class:"dot"}), h("span",null,"Niveau : ", h("b",null,lvName)), h("button",{onclick:onBack},"Modifier")),
     grid,
     extra,
     h("div",{class:"spacer"}),
@@ -341,8 +338,8 @@ function soloSetup(){
   levelScreen(soloOpts, {title:"Solo", onBack:home, onPick:soloTheme});
 }
 function soloTheme(){
-  themeScreen(soloOpts, {title:"Solo", onBack:soloSetup, goLabel:"C'est parti !",
-    extra: h("div",{class:"stack"}, h("span",{class:"label"},"Combien de questions ?"),
+  themeScreen(soloOpts, {title:"Solo", onBack:soloSetup, goLabel:"Commencer la partie",
+    extra: h("div",{class:"stack"}, h("span",{class:"label"},"Nombre de questions"),
       chipGroup([10,20,50].map(n=>({v:n,l:String(n)})), soloOpts.n, v=>{soloOpts.n=v;})),
     onGo:()=>{
       store.set("hq_solo", soloOpts);
@@ -384,8 +381,8 @@ function startSolo(ids, title){
       if(!ok) v.opts.children[k].classList.add("ko");
       record(id, ok); answers.push({id, ok, picked:q[1][order[k]]});
       fbWrap.append(
-        h("div",{class:"feedback"+(ok?"":" bad")}, h("b",null, ok ? pick(["Bien joué !","Bravo !","Exact !","Trop fort !"]) : `Raté ! C'était : ${q[1][q[2]]}`), q[3] ? h("span",{class:"muted small"},"Source : "+q[3]) : null),
-        h("button",{class:"btn primary",onclick:()=>{ i++; i<ids.length ? step() : soloEnd(); }}, i+1<ids.length ? "Suivante" : "Voir mon score"));
+        h("div",{class:"feedback"+(ok?"":" bad")}, h("b",null, ok ? "Bonne réponse" : `Réponse incorrecte. La bonne réponse était : ${q[1][q[2]]}`), q[3] ? h("span",{class:"muted small"},"Source : "+q[3]) : null),
+        h("button",{class:"btn primary",onclick:()=>{ i++; i<ids.length ? step() : soloEnd(); }}, i+1<ids.length ? "Question suivante" : "Voir le résultat"));
       fbWrap.lastChild.focus();
     }});
     render(header(title, ()=>confirmBox("Quitter la partie en cours ?","Quitter",home)), v.node, fbWrap);
@@ -395,16 +392,16 @@ function startSolo(ids, title){
     const pct = Math.round(good/answers.length*100);
     render(
       header(title, home),
-      h("div",{class:"stack"}, h("span",{class:"label"},"Ton score"), h("div",{class:"big"},`${good} / ${answers.length}`),
-        h("p",{class:"muted"}, pct>=80 ? "Trop fort, tu gères !" : pct>=50 ? "Pas mal ! Encore un petit effort." : "Continue, tu progresses à chaque partie.")),
+      h("div",{class:"stack"}, h("span",{class:"label"},"Résultat"), h("div",{class:"big"},`${good} / ${answers.length}`),
+        h("p",{class:"muted"}, pct>=80 ? "Excellent résultat. Le sujet est bien maîtrisé." : pct>=50 ? "Bon résultat. Quelques points restent à consolider." : "Chaque partie permet de progresser. Revoyez les réponses ci-dessous.")),
       h("div",{class:"row"},
         h("button",{class:"btn primary grow",onclick:()=>startSolo(shuffle(ids),title)},"Rejouer"),
         h("button",{class:"btn ghost center grow",onclick:home},"Accueil")),
-      answers.some(a=>!a.ok) ? h("span",{class:"label"},"Tes erreurs à retenir") : null,
+      answers.some(a=>!a.ok) ? h("span",{class:"label"},"Réponses à revoir") : null,
       h("div",{class:"review"}, answers.filter(a=>!a.ok).map(a => h("div",{class:"card"},
         h("p",null,Q[a.id][0]),
         h("p",{class:"ans"}, h("span",{style:"color:var(--good);font-weight:600"},"✓ "+Q[a.id][1][Q[a.id][2]])),
-        h("p",{class:"ans muted"},"Ta réponse : "+a.picked))))
+        h("p",{class:"ans muted"},"Votre réponse : "+a.picked))))
     );
   }
   step();
@@ -423,16 +420,16 @@ function statsScreen(){
       h("div",{class:"bar"}, h("i",{style:`width:${total?right/total*100:0}%`})));
   });
   render(
-    header("Stats", home),
-    h("h2",null,"Mes stats"),
+    header("Progression", home),
+    h("h2",null,"Ma progression"),
     h("div",{class:"tiles3"},
       h("div",{class:"card"}, h("b",null,String(ids.length)), h("span",{class:"muted small"},"vues")),
       h("div",{class:"card"}, h("b",null, ids.length ? Math.round(ok/ids.length*100)+" %" : "–"), h("span",{class:"muted small"},"justes")),
       h("div",{class:"card"}, h("b",null,String(tries)), h("span",{class:"muted small"},"réponses"))),
     h("div",{class:"card stack"}, h("span",{class:"label"},"Bonnes réponses par thème"), rows),
-    h("p",{class:"muted small"},"Ta progression reste sur ton téléphone. Le quiz marche aussi sans internet."),
+    h("p",{class:"muted small"},"Votre progression est enregistrée uniquement sur cet appareil."),
     h("div",{class:"spacer"}),
-    h("button",{class:"btn ghost center",onclick:()=>confirmBox("Effacer toute ta progression sur cet appareil ?","Effacer",()=>{progress={}; store.set("hq_progress",progress); statsScreen();})},"Remettre à zéro")
+    h("button",{class:"btn ghost center",onclick:()=>confirmBox("Effacer toute la progression enregistrée sur cet appareil ?","Effacer",()=>{progress={}; store.set("hq_progress",progress); statsScreen();})},"Remettre à zéro")
   );
 }
 
@@ -449,47 +446,47 @@ function cleanName(s){ return String(s||"").replace(/[\u0000-\u001f\u007f-\u009f
 (async()=>{ try{ roomNS = await window.claude?.use?.("room"); }catch(e){ roomNS = null; } roomReady = true; })();
 
 function multiHome(){
-  if(!roomReady){ toast("Connexion en cours, réessaie dans un instant."); return; }
+  if(!roomReady){ toast("Connexion en cours, veuillez réessayer dans un instant."); return; }
   if(!navigator.onLine){
-    render(header("Entre potes", home), h("h2",null,"Pas de connexion"),
-      h("p",{class:"muted"},"Pour jouer avec des potes, il faut internet. Le mode solo, lui, marche sans."),
+    render(header("Multijoueur", home), h("h2",null,"Pas de connexion"),
+      h("p",{class:"muted"},"Le mode multijoueur nécessite une connexion internet. Le mode solo reste disponible hors connexion."),
       h("div",{class:"spacer"}), h("button",{class:"btn primary",onclick:home},"Retour à l'accueil"));
     return;
   }
-  const nameIn = h("input",{type:"text",id:"pname",placeholder:"Ton prénom",maxlength:"18",value:myName,autocomplete:"nickname"});
+  const nameIn = h("input",{type:"text",id:"pname",placeholder:"Votre prénom",maxlength:"18",value:myName,autocomplete:"nickname"});
   const codeIn = h("input",{type:"text",id:"pcode",class:"code",placeholder:"CODE",maxlength:"5",autocomplete:"off",autocapitalize:"characters",spellcheck:"false"});
-  function takeName(){ const n = cleanName(nameIn.value); if(!n){ nameIn.focus(); toast("Entre ton prénom d'abord."); return null; } myName = n; store.set("hq_name", n); return n; }
+  function takeName(){ const n = cleanName(nameIn.value); if(!n){ nameIn.focus(); toast("Veuillez saisir votre prénom."); return null; } myName = n; store.set("hq_name", n); return n; }
   render(
-    header("Entre potes", home),
-    h("h2",null,"Jouer avec des potes"),
-    h("div",{class:"stack"}, h("label",{class:"label",for:"pname"},"Ton prénom"), nameIn),
+    header("Multijoueur", home),
+    h("h2",null,"Mode multijoueur"),
+    h("div",{class:"stack"}, h("label",{class:"label",for:"pname"},"Votre prénom"), nameIn),
     h("div",{class:"card stack"},
-      h("span",{class:"label"},"Rejoindre une partie"),
-      h("label",{class:"muted small",for:"pcode"},"Entre le code que l'hôte t'a donné."),
+      h("span",{class:"label"},"Rejoindre un salon"),
+      h("label",{class:"muted small",for:"pcode"},"Saisissez le code communiqué par l'organisateur."),
       codeIn,
       h("button",{class:"btn primary",onclick:()=>{
         if(!takeName()) return;
         const c = codeIn.value.toUpperCase().replace(/[^A-Z0-9]/g,"");
-        if(c.length!==5){ codeIn.focus(); toast("Le code fait 5 caractères."); return; }
+        if(c.length!==5){ codeIn.focus(); toast("Le code comporte 5 caractères."); return; }
         joinGame(c, false);
       }},"Rejoindre")),
     h("div",{class:"card stack"},
-      h("span",{class:"label"},"Créer une partie"),
-      h("p",{class:"muted small"},"Tu reçois un code à donner à tes potes. Tu joues aussi."),
-      h("button",{class:"btn center",onclick:()=>{ if(takeName()) hostSetup(); }},"Créer une partie")),
-    h("p",{class:"muted small"},"Envoie le lien du quiz à tes potes : ils vont dans « Jouer avec des potes » et tapent ton code. Garde l'appli ouverte pendant la partie.")
+      h("span",{class:"label"},"Créer un salon"),
+      h("p",{class:"muted small"},"Un code est généré pour inviter les autres joueurs. L'organisateur participe aussi."),
+      h("button",{class:"btn center",onclick:()=>{ if(takeName()) hostSetup(); }},"Créer un salon")),
+    h("p",{class:"muted small"},"Les participants ouvrent « Mode multijoueur » et saisissent le code du salon. L'application de l'organisateur doit rester ouverte pendant toute la partie.")
   );
 }
 
 let hostOpts = store.get("hq_host", {cat:"*", lvl:"*", n:10, t:20});
 function hostSetup(){
-  levelScreen(hostOpts, {title:"Nouvelle partie", onBack:multiHome, onPick:hostTheme});
+  levelScreen(hostOpts, {title:"Nouveau salon", onBack:multiHome, onPick:hostTheme});
 }
 function hostTheme(){
-  themeScreen(hostOpts, {title:"Nouvelle partie", onBack:hostSetup, goLabel:"Créer la partie",
+  themeScreen(hostOpts, {title:"Nouveau salon", onBack:hostSetup, goLabel:"Créer le salon",
     extra: h("div",{class:"stack"},
-      h("span",{class:"label"},"Combien de questions ?"), chipGroup([5,10,15,20].map(n=>({v:n,l:String(n)})), hostOpts.n, v=>{hostOpts.n=v;}),
-      h("span",{class:"label"},"Temps pour répondre"), chipGroup([10,20,30].map(n=>({v:n,l:n+" s"})), hostOpts.t, v=>{hostOpts.t=v;})),
+      h("span",{class:"label"},"Nombre de questions"), chipGroup([5,10,15,20].map(n=>({v:n,l:String(n)})), hostOpts.n, v=>{hostOpts.n=v;}),
+      h("span",{class:"label"},"Temps par question"), chipGroup([10,20,30].map(n=>({v:n,l:n+" s"})), hostOpts.t, v=>{hostOpts.t=v;})),
     onGo:()=>{ store.set("hq_host",hostOpts); joinGame(newCode(), true); }});
 }
 
@@ -547,7 +544,7 @@ function peerRoom(code, isHost){
   });
 }
 async function joinGame(code, isHost){
-  render(h("div",{class:"loading"},"Connexion à la partie…"));
+  render(h("div",{class:"loading"},"Connexion au salon…"));
   let r;
   try{
     if(roomNS) r = await roomNS.join("hq-" + code.toLowerCase());
@@ -559,8 +556,8 @@ async function joinGame(code, isHost){
   }
   catch(e){
     if(e && e.message==="taken" && isHost){ return joinGame(newCode(), true); }
-    if(e && e.message==="nohost"){ render(header("Multijoueur", multiHome), h("h2",null,"Aucune partie trouvée"), h("p",{class:"muted"},`Personne n'héberge la partie ${code} en ce moment. Vérifie le code avec l'hôte, et demande-lui de garder l'appli ouverte.`), h("button",{class:"btn primary",onclick:multiHome},"Retour")); return; }
-    render(header("Multijoueur", multiHome), h("h2",null,"Connexion impossible"), h("p",{class:"muted"},"La partie n'a pas pu être rejointe. Vérifie ta connexion et réessaie."), h("button",{class:"btn primary",onclick:multiHome},"Réessayer")); return;
+    if(e && e.message==="nohost"){ render(header("Multijoueur", multiHome), h("h2",null,"Aucune partie trouvée"), h("p",{class:"muted"},`Personne n'héberge la partie ${code} en ce moment. Vérifiez le code auprès de l'organisateur et assurez-vous que son application est ouverte.`), h("button",{class:"btn primary",onclick:multiHome},"Retour")); return; }
+    render(header("Multijoueur", multiHome), h("h2",null,"Connexion impossible"), h("p",{class:"muted"},"Impossible de rejoindre le salon. Vérifiez votre connexion et réessayez."), h("button",{class:"btn primary",onclick:multiHome},"Réessayer")); return;
   }
   game = {code, isHost, r, unsubs:[], st:null, hostPeer:null, myPeer:null, myAns:null, shownAt:0, shownIdx:-1, ended:false};
   const me = { r: isHost ? "h" : "p", nm: myName };
@@ -591,12 +588,12 @@ function onPeersChange(peers){
   if(st && (!game.st || st.v !== game.st.v)){ game.st = st; playerRender(); }
 }
 function waitHost(){
-  render(quitBtn(), h("h2",null,"Recherche de la partie…"), h("p",{class:"muted"},`Code ${game.code}. Si rien ne se passe, vérifie le code avec l'hôte.`));
-  game.waitT = setTimeout(()=>{ if(game && !game.hostPeer) render(quitBtn(), h("h2",null,"Aucune partie trouvée"), h("p",{class:"muted"},`Personne n'héberge la partie ${game.code} en ce moment. Vérifie le code, ou demande à l'hôte de laisser le quiz ouvert.`), h("p",{class:"muted small"},"Tu restes en attente : la partie s'affichera dès que l'hôte sera là.")); }, 6000);
+  render(quitBtn(), h("h2",null,"Recherche de la partie…"), h("p",{class:"muted"},`Code ${game.code}. Si rien ne se passe, vérifiez le code auprès de l'organisateur.`));
+  game.waitT = setTimeout(()=>{ if(game && !game.hostPeer) render(quitBtn(), h("h2",null,"Aucune partie trouvée"), h("p",{class:"muted"},`Personne n'héberge la partie ${game.code} en ce moment. Vérifiez le code ou demandez à l'organisateur de garder l'application ouverte.`), h("p",{class:"muted small"},"La partie s'affichera dès que l'organisateur sera connecté.")); }, 6000);
 }
 function hostGone(){
   const code = game.code; leaveGame();
-  render(header("Multijoueur", multiHome), h("h2",null,"L'hôte a quitté la partie"), h("p",{class:"muted"},`La partie ${code} est terminée.`), h("button",{class:"btn primary",onclick:multiHome},"Retour"));
+  render(header("Multijoueur", multiHome), h("h2",null,"L'organisateur a quitté la partie"), h("p",{class:"muted"},`La partie ${code} est terminée.`), h("button",{class:"btn primary",onclick:multiHome},"Retour"));
 }
 
 /* ----- host engine ----- */
@@ -699,7 +696,7 @@ function hostPublish(){
 /* ----- shared rendering for host & players ----- */
 function scoreboard(sc, phase){
   return h("div",{class:"players"}, sc.map(([peer,nm,s,flag],idx)=> h("div",{class:"player"+(peer===game.myPeer?" me":"")},
-    h("div",{class:"row"}, h("span",{class:"rk"}, String(idx+1)), h("span",null, nm + (peer===game.myPeer?" (toi)":""))),
+    h("div",{class:"row"}, h("span",{class:"rk"}, String(idx+1)), h("span",null, nm + (peer===game.myPeer?" (vous)":""))),
     h("div",{class:"row"},
       phase==="q" ? h("span",{class:"st"}, flag ? "a répondu" : "réfléchit…") :
       phase==="rv" ? h("span",{class:"st",style:`color:${flag===1?"var(--good)":flag===0?"var(--bad)":"var(--muted)"}`}, flag===1?"juste":flag===0?"faux":"pas de réponse") : null,
@@ -730,8 +727,8 @@ function playerRender(){
     if(!g.isHost && g.recorded !== st.i && chosen!=null){ g.recorded = st.i; record(id, chosen===st.c); }
   }
   const info = st.ph==="rv"
-    ? h("div",{class:"feedback"+(chosen===st.c?"":" bad")}, h("b",null, chosen==null ? `Trop tard ! C'était : ${q[1][q[2]]}` : chosen===st.c ? "Bien joué !" : `Raté ! C'était : ${q[1][q[2]]}`), q[3] ? h("span",{class:"muted small"},"Source : "+q[3]) : null)
-    : chosen!=null ? h("p",{class:"muted small"},"Réponse envoyée. On attend les autres…") : null;
+    ? h("div",{class:"feedback"+(chosen===st.c?"":" bad")}, h("b",null, chosen==null ? `Temps écoulé. La bonne réponse était : ${q[1][q[2]]}` : chosen===st.c ? "Bonne réponse" : `Réponse incorrecte. La bonne réponse était : ${q[1][q[2]]}`), q[3] ? h("span",{class:"muted small"},"Source : "+q[3]) : null)
+    : chosen!=null ? h("p",{class:"muted small"},"Réponse enregistrée. En attente des autres joueurs…") : null;
   render(quitBtn(), v.node, info, h("span",{class:"label"}, st.ph==="rv" ? "Classement" : "Joueurs"), scoreboard(st.sc, st.ph));
 }
 function lobbyView(st){
@@ -740,16 +737,16 @@ function lobbyView(st){
   render(
     quitBtn(),
     h("div",{class:"card stack",style:"text-align:center"},
-      h("span",{class:"label"}, g.isHost ? "Code à partager" : "Tu es dans la partie"),
+      h("span",{class:"label"}, g.isHost ? "Code à partager" : "Vous avez rejoint le salon"),
       h("div",{class:"codebox"}, g.code),
-      g.isHost ? h("button",{class:"btn ghost center",onclick:()=>{ navigator.clipboard?.writeText(g.code).then(()=>toast("Code copié"),()=>toast("Copie impossible, dicte le code.")); }},"Copier le code") : null),
+      g.isHost ? h("button",{class:"btn ghost center",onclick:()=>{ navigator.clipboard?.writeText(g.code).then(()=>toast("Code copié"),()=>toast("Copie impossible. Communiquez le code manuellement.")); }},"Copier le code") : null),
     h("p",{class:"muted"}, `${st.cat} · ${st.n} questions · ${st.t} s par question`),
     h("span",{class:"label"}, `Joueurs (${st.sc.length})`),
     scoreboard(st.sc, "lobby"),
     h("div",{class:"spacer"}),
     g.isHost
       ? h("button",{class:"btn primary",disabled:!canStart,onclick:hostStart},"Lancer la partie")
-      : h("p",{class:"muted center"},"En attente du lancement par l'hôte…")
+      : h("p",{class:"muted center"},"En attente du lancement par l'organisateur…")
   );
 }
 function endView(st){
@@ -761,7 +758,7 @@ function endView(st){
     h("div",{class:"stack"},
       h("span",{class:"label"},"Partie terminée"),
       h("h2",null, winner ? `${winner[1]} gagne avec ${winner[2].toLocaleString("fr-FR")} points` : "Partie terminée"),
-      myRank>=0 ? h("p",{class:"muted"}, `Tu finis ${myRank===0?"1er":(myRank+1)+"e"} sur ${st.sc.length}.`) : null),
+      myRank>=0 ? h("p",{class:"muted"}, `Votre classement : ${myRank===0?"1er":(myRank+1)+"e"} sur ${st.sc.length}.`) : null),
     scoreboard(st.sc, "end"),
     h("div",{class:"spacer"}),
     g.isHost
@@ -774,14 +771,14 @@ function endView(st){
 
 /* ---------- boot ---------- */
 if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js").catch(()=>{}); }catch(e){} }
-fetch("questions.json").then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(data=>{
+fetch("data/questions.json").then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(data=>{
   Q = data;
   const order = ["Les 7 Rabbeim","Philosophie & Textes","Minhaguim & Coutumes","Histoire & Dates","Histoire & Lieux","Mivtsaim & Campagnes","Institutions & Rayonnement","Nigounim & Figures"];
   const seen = [...new Set(Q.map(q=>q[5]))];
   CATS = order.filter(c=>seen.includes(c)).concat(seen.filter(c=>!order.includes(c)));
   home();
 }).catch(()=>{
-  render(h("h2",null,"Les questions n'ont pas pu être chargées"), h("p",{class:"muted"},"Vérifie ta connexion puis recharge la page."), h("button",{class:"btn primary",onclick:()=>location.reload()},"Recharger"));
+  render(h("h2",null,"Les questions n'ont pas pu être chargées"), h("p",{class:"muted"},"Vérifiez votre connexion puis rechargez la page."), h("button",{class:"btn primary",onclick:()=>location.reload()},"Recharger"));
 });
 </script>
 </body>

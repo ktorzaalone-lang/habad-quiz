@@ -9,9 +9,16 @@
   "theme_color": "#110d09",
   "icons": [
     {
-      "src": "apple-touch-icon.png",
+      "src": "assets/icons/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/jpeg"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
-  ]
+  ],
+  "description": "Quiz sur les Rabbeim, la 'hassidout, les coutumes et l'histoire de Habad."
 }
