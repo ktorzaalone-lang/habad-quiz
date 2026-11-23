@@ -149,6 +149,9 @@ input.code{text-transform:uppercase;letter-spacing:.35em;font-weight:700;text-al
 .modal{position:fixed;inset:0;background:rgba(10,7,4,.75);display:grid;place-items:center;padding:20px;z-index:10}
 .modal .card{max-width:400px;width:100%;display:flex;flex-direction:column;gap:14px;background:#211a13}
 .spacer{flex:1}
+body.home::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(17,13,9,.62) 0%,rgba(17,13,9,.35) 45%,rgba(17,13,9,.55) 75%,rgba(17,13,9,.92) 100%),url("assets/img/770-entree.jpg") center 35% / cover no-repeat}
+body.home .tile{background:rgba(28,22,16,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .brand{display:flex;align-items:center;gap:10px;color:var(--gold);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.76rem}
 .brand svg{width:20px;height:20px}
 .title-block{display:flex;flex-direction:column;gap:10px}
@@ -231,7 +234,7 @@ const ICON = {
   redo:'<path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/>',
   chev:'<path d="M9 6l6 6-6 6"/>'
 };
-function render(...nodes){ app.classList.remove("enter"); app.replaceChildren(...nodes); window.scrollTo(0,0); void app.offsetWidth; app.classList.add("enter"); }
+function render(...nodes){ app.classList.remove("enter"); app.replaceChildren(...nodes); document.body.classList.toggle("home", !!app.querySelector(".brand")); window.scrollTo(0,0); void app.offsetWidth; app.classList.add("enter"); }
 function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
 function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
 function toast(msg){ const t = h("div",{class:"toast",role:"status"},msg); document.body.append(t); setTimeout(()=>t.remove(), 2600); }

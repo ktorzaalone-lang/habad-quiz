@@ -1,7 +1,7 @@
 // Service worker : réseau d'abord, cache en secours (fonctionnement hors connexion).
-const CACHE = "quiz-habad-v3";
+const CACHE = "quiz-habad-v4";
 const FILES = ["./", "index.html", "data/questions.json", "manifest.webmanifest",
-  "assets/icons/apple-touch-icon.png", "assets/icons/icon-192.png", "assets/icons/icon-512.png"];
+  "assets/icons/apple-touch-icon.png", "assets/icons/icon-192.png", "assets/icons/icon-512.png", "assets/img/770-entree.jpg"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))); self.clients.claim(); });
 self.addEventListener("fetch", e => {
