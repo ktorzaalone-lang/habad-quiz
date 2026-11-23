@@ -299,6 +299,14 @@ const TITLE_FONTS = [
   '400 1.12em "Bebas Neue", Impact, sans-serif',
   '800 .92em "Rubik", system-ui, sans-serif'
 ];
+// Liste des nigounim joués en fond : il suffit d'ajouter un fichier dans assets/audio/ et son nom ici.
+const NIGOUNIM = ["assets/audio/nigoun.mp3"];
+let lastTrack = -1;
+function nextTrack(){
+  let i = Math.floor(Math.random()*NIGOUNIM.length);
+  if(NIGOUNIM.length > 1) while(i === lastTrack) i = Math.floor(Math.random()*NIGOUNIM.length);
+  lastTrack = i; return NIGOUNIM[i];
+}
 const music = { on: store.get("hq_music", true), el: null, ctx: null, an: null, data: null, avg: 0, last: 0, raf: 0, started: false };
 const ICON_SOUND_ON = '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/>';
 const ICON_SOUND_OFF = '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/>';
@@ -329,7 +337,9 @@ function musicLoop(){
 function musicStart(){
   if(!music.on) return;
   if(!music.el){
-    music.el = new Audio("assets/audio/nigoun.mp3"); music.el.loop = true; music.el.volume = 0.4; music.el.preload = "auto";
+    music.el = new Audio(nextTrack()); music.el.loop = false; music.el.volume = 0.4; music.el.preload = "auto";
+    // à la fin d'un nigoun, on enchaîne sur un autre, tiré au hasard
+    music.el.addEventListener("ended", ()=>{ if(!music.on) return; music.el.src = nextTrack(); music.el.play().catch(()=>{}); });
     try{
       const AC = window.AudioContext || window.webkitAudioContext;
       music.ctx = new AC(); const src = music.ctx.createMediaElementSource(music.el);

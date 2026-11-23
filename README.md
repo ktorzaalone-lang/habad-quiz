@@ -10,7 +10,7 @@ Application de quiz sur Habad : les Rabbeim, la 'hassidout, les coutumes (minhag
 - **Mode solo** : sélection du niveau, puis du thème et du nombre de questions, avec suivi de la progression par niveau et par thème.
 - **Mode multijoueur** : un organisateur crée un salon et communique un code à 5 caractères ; les participants le saisissent pour rejoindre la partie.
 - **Révision** : les questions manquées peuvent être rejouées depuis l'accueil.
-- **Musique de fond** : un nigoun accompagne l'application (bouton en haut à droite pour la couper). Les lettres du titre changent de police au rythme de la musique.
+- **Musique de fond** : des nigounim tirés au hasard accompagnent l'application (pour en ajouter un : déposer le .mp3 dans assets/audio/ et ajouter son chemin dans la liste NIGOUNIM de index.html) (bouton en haut à droite pour la couper). Les lettres du titre changent de police au rythme de la musique.
 - **Hors connexion** : l'application s'installe sur iPhone et Android (« Ajouter à l'écran d'accueil ») et fonctionne sans internet en mode solo.
 
 ## Structure
