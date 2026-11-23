@@ -15,7 +15,7 @@
 <meta name="description" content="770 Habad Quiz : 1565 questions sur les Rabbeim, la 'hassidout, les minhaguim et l'histoire de Habad.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@700&family=Frank+Ruhl+Libre:wght@700;900&family=Playfair+Display:ital,wght@1,900&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* 770 Habad Quiz — fond sombre chaud, accents or. Une colonne centrée (max 560px), écrans remplacés sur place avec un léger fondu. */
 :root{
@@ -149,6 +149,18 @@ input.code{text-transform:uppercase;letter-spacing:.35em;font-weight:700;text-al
 .modal{position:fixed;inset:0;background:rgba(10,7,4,.75);display:grid;place-items:center;padding:20px;z-index:10}
 .modal .card{max-width:400px;width:100%;display:flex;flex-direction:column;gap:14px;background:#211a13}
 .spacer{flex:1}
+/* musique de fond + titre animé */
+.music{position:fixed;top:calc(env(safe-area-inset-top) + 12px);right:calc(env(safe-area-inset-right) + 12px);z-index:30;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(28,22,16,.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--gold);display:grid;place-items:center;cursor:pointer}
+.music svg{width:20px;height:20px}
+.music[aria-pressed="false"]{color:var(--muted)}
+.music:focus-visible{outline:3px solid var(--gold-2);outline-offset:2px}
+.top{padding-right:52px}
+.brand{padding-right:52px}
+.beat-title{display:flex;flex-wrap:wrap;column-gap:.28em;align-items:baseline;min-height:1.1em}
+.beat-title .w{display:inline-flex;white-space:nowrap}
+.beat-title .w.n{color:var(--gold)}
+.beat-title .l{display:inline-block;transition:transform .12s ease-out;will-change:transform}
+.beat-title.pulse .l{transform:scale(1.06)}
 body.home::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   background:linear-gradient(180deg,rgba(17,13,9,.62) 0%,rgba(17,13,9,.35) 45%,rgba(17,13,9,.55) 75%,rgba(17,13,9,.92) 100%),url("assets/img/770-entree.jpg") center 35% / cover no-repeat}
 body.home .tile{background:rgba(28,22,16,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
@@ -262,6 +274,73 @@ function chipGroup(options, value, onChange){
 function pool(cat, lvl){ const out=[]; Q.forEach((q,i)=>{ if((cat==="*"||q[5]===cat) && (lvl==="*"||q[4]===lvl)) out.push(i); }); return out; }
 function countFor(cat, lvl){ return pool(cat,lvl).length; }
 
+/* ---------- musique de fond ---------- */
+const TITLE_FONTS = [
+  '900 1em "Frank Ruhl Libre", Georgia, serif',
+  'italic 900 1em "Playfair Display", Georgia, serif',
+  '700 .92em "Cinzel", Georgia, serif',
+  '400 1.12em "Bebas Neue", Impact, sans-serif',
+  '800 .92em "Rubik", system-ui, sans-serif'
+];
+const music = { on: store.get("hq_music", true), el: null, ctx: null, an: null, data: null, avg: 0, last: 0, raf: 0, started: false };
+const ICON_SOUND_ON = '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/>';
+const ICON_SOUND_OFF = '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/>';
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function beatTitle(){
+  const el = h("h1",{class:"beat-title","aria-label":"770 Habad Quiz"});
+  [["770","w n"],["Habad","w"],["Quiz","w"]].forEach(([word,cls])=>{
+    el.append(h("span",{class:cls,"aria-hidden":"true"}, [...word].map(c=>h("span",{class:"l"},c))));
+  });
+  return el;
+}
+function swapFonts(){
+  const t = app.querySelector(".beat-title"); if(!t) return;
+  const f = TITLE_FONTS[Math.floor(Math.random()*TITLE_FONTS.length)];
+  t.querySelectorAll(".l").forEach((l,i)=>{ l.style.font = (i%3===0) ? TITLE_FONTS[Math.floor(Math.random()*TITLE_FONTS.length)] : f; });
+  t.classList.add("pulse"); setTimeout(()=>t.classList.remove("pulse"),110);
+}
+function resetFonts(){ const t = app.querySelector(".beat-title"); if(t) t.querySelectorAll(".l").forEach(l=>l.style.font=""); }
+function musicLoop(){
+  music.raf = requestAnimationFrame(musicLoop);
+  if(!music.an || music.el.paused) return;
+  music.an.getByteFrequencyData(music.data);
+  let e = 0; for(let i=1;i<10;i++) e += music.data[i]; e /= 9;          // basses
+  music.avg = music.avg ? music.avg*0.94 + e*0.06 : e;
+  const now = performance.now();
+  if(e > music.avg*1.05 && e > 110 && now - music.last > 230){ music.last = now; if(!reduceMotion) swapFonts(); }
+}
+function musicStart(){
+  if(!music.on) return;
+  if(!music.el){
+    music.el = new Audio("assets/audio/nigoun.mp3"); music.el.loop = true; music.el.volume = 0.4; music.el.preload = "auto";
+    try{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      music.ctx = new AC(); const src = music.ctx.createMediaElementSource(music.el);
+      music.an = music.ctx.createAnalyser(); music.an.fftSize = 256; music.an.smoothingTimeConstant = 0.6;
+      music.data = new Uint8Array(music.an.frequencyBinCount);
+      src.connect(music.an); music.an.connect(music.ctx.destination);
+    }catch(e){ music.an = null; }
+    musicLoop();
+  }
+  if(music.ctx && music.ctx.state==="suspended") music.ctx.resume();
+  music.el.play().then(()=>{ music.started = true; }).catch(()=>{});
+}
+function musicSet(on){
+  music.on = on; store.set("hq_music", on);
+  const b = document.getElementById("musicBtn");
+  b.setAttribute("aria-pressed", String(on)); b.setAttribute("aria-label", on ? "Couper la musique" : "Activer la musique");
+  b.replaceChildren(svg(on ? ICON_SOUND_ON : ICON_SOUND_OFF));
+  if(on) musicStart(); else { if(music.el) music.el.pause(); resetFonts(); }
+}
+(function initMusic(){
+  const b = h("button",{id:"musicBtn",class:"music",type:"button",onclick:(e)=>{ e.stopPropagation(); musicSet(!music.on); }});
+  document.body.append(b); musicSet(music.on);
+  // les navigateurs bloquent le son avant une première interaction : on démarre au premier geste
+  const first = ()=>{ if(music.on && !music.started) musicStart(); };
+  ["pointerdown","keydown","touchstart"].forEach(ev=>document.addEventListener(ev, first, {passive:true}));
+  document.addEventListener("visibilitychange", ()=>{ if(!music.el) return; if(document.hidden) music.el.pause(); else if(music.on && music.started) music.el.play().catch(()=>{}); });
+})();
+
 /* ---------- home ---------- */
 function tile(icon, title, sub, onclick, extra){
   return h("button",{class:"btn tile"+(extra||""),onclick}, h("div",{class:"ic"},svg(icon)), h("div",null,h("b",null,title),h("span",null,sub)), h("div",{class:"chev"},svg(ICON.chev)));
@@ -273,7 +352,7 @@ function home(){
   render(
     h("div",{class:"brand"}, svg(ICON.flame), "Hassidout · Histoire · Minhaguim"),
     h("div",{class:"title-block"},
-      h("h1",null,h("span",{class:"n"},"770 "),"Habad Quiz"),
+      beatTitle(),
       h("p",{class:"muted"}, `${Q.length.toLocaleString("fr-FR")} questions sur les Rabbeim, la 'hassidout, les coutumes et l'histoire de Habad.`)),
     h("div",{class:"stack"},
       tile(ICON.solo, "Jouer en solo", "Choisissez un niveau, puis un thème", ()=>soloSetup(), " main"),
