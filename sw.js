@@ -1,5 +1,5 @@
 // Service worker : réseau d'abord, cache en secours (fonctionnement hors connexion).
-const CACHE = "quiz-habad-v8";
+const CACHE = "quiz-habad-v9";
 const FILES = ["./", "index.html", "data/questions.json", "manifest.webmanifest",
   "assets/icons/apple-touch-icon.png", "assets/icons/icon-192.png", "assets/icons/icon-512.png", "assets/img/770-entree.jpg"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });

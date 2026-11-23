@@ -149,6 +149,29 @@ input.code{text-transform:uppercase;letter-spacing:.35em;font-weight:700;text-al
 .modal{position:fixed;inset:0;background:rgba(10,7,4,.75);display:grid;place-items:center;padding:20px;z-index:10}
 .modal .card{max-width:400px;width:100%;display:flex;flex-direction:column;gap:14px;background:#211a13}
 .spacer{flex:1}
+/* ---- écran d'accueil animé ---- */
+#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;cursor:pointer;
+  background:radial-gradient(60% 45% at 50% 45%,#3a2810 0%,#1a120a 55%,#0b0805 100%);transition:opacity .6s ease,visibility .6s}
+#splash.out{opacity:0;visibility:hidden}
+#splash.out .sp-logo{transform:scale(1.25);opacity:0;transition:transform .6s ease,opacity .5s ease}
+.sp-logo{position:relative;width:min(46vw,200px);aspect-ratio:1;border-radius:22%;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(227,178,91,.55),0 0 60px rgba(227,178,91,.35);
+  animation:spIn 1.1s cubic-bezier(.2,.9,.25,1.15) both}
+.sp-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.sp-shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,236,190,.75) 48%,transparent 62%);
+  transform:translateX(-130%);animation:spShine 1.2s ease-in-out .9s both;mix-blend-mode:screen}
+.sp-rings{position:absolute;top:50%;left:50%;width:0;height:0}
+.sp-rings i{position:absolute;left:50%;top:50%;width:min(46vw,200px);aspect-ratio:1;border-radius:50%;border:1.5px solid rgba(227,178,91,.6);
+  transform:translate(-50%,-62%) scale(.8);opacity:0;animation:spRing 2s ease-out .5s infinite}
+.sp-rings i:nth-child(2){animation-delay:1.1s}.sp-rings i:nth-child(3){animation-delay:1.7s}
+.sp-title{font-family:var(--display);font-weight:900;font-size:clamp(1.8rem,8vw,2.6rem);color:var(--ink);letter-spacing:.02em;animation:spUp .7s ease .6s both}
+.sp-title .n{color:var(--gold)}
+.sp-sub{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600;animation:spUp .7s ease .85s both}
+@keyframes spIn{0%{transform:scale(.4) rotate(-8deg);opacity:0;filter:blur(8px)}70%{filter:blur(0)}100%{transform:none;opacity:1;filter:none}}
+@keyframes spShine{to{transform:translateX(130%)}}
+@keyframes spRing{0%{transform:translate(-50%,-62%) scale(.8);opacity:.8}100%{transform:translate(-50%,-62%) scale(2.2);opacity:0}}
+@keyframes spUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){#splash *{animation:none!important}}
 .src{display:flex;gap:8px;align-items:flex-start;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted)}
 .src svg{width:16px;height:16px;flex:none;margin-top:2px;color:var(--gold)}
 .feedback .src b,.src b{display:inline;font-size:inherit;margin:0;color:var(--ink);font-weight:600}
@@ -200,6 +223,22 @@ body.home .tile{background:rgba(28,22,16,.86);backdrop-filter:blur(6px);-webkit-
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true">
+  <div class="sp-rings"><i></i><i></i><i></i></div>
+  <div class="sp-logo"><img src="assets/icons/icon-512.png" alt=""><span class="sp-shine"></span></div>
+  <div class="sp-title"><span class="n">770</span> Habad Quiz</div>
+  <div class="sp-sub">Hassidout · Histoire · Minhaguim</div>
+</div>
+<script>
+/* écran d'accueil animé : se ferme seul après ~2,6 s, ou au premier appui */
+(function(){
+  var sp = document.getElementById("splash");
+  function close(){ if(!sp || sp.classList.contains("out")) return; sp.classList.add("out"); setTimeout(function(){ sp.remove(); }, 650); }
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  setTimeout(close, reduce ? 900 : 2600);
+  sp.addEventListener("click", close);
+})();
+</script>
 <main id="app" aria-live="polite"><div class="loading">Chargement des questions…</div></main>
 
 <script>
