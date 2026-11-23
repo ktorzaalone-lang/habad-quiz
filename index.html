@@ -340,20 +340,27 @@ function musicStart(){
     musicLoop();
   }
   if(music.ctx && music.ctx.state==="suspended") music.ctx.resume();
-  music.el.play().then(()=>{ music.started = true; }).catch(()=>{});
+  music.el.play().then(()=>{ music.started = true; if(!music.on) musicStop(); }).catch(()=>{});
+}
+// couper pour de bon : pause, volume à zéro, sortie audio suspendue (nécessaire sur iPhone)
+function musicStop(){
+  if(music.el){ music.el.pause(); music.el.muted = true; music.el.volume = 0; }
+  if(music.ctx && music.ctx.state === "running") music.ctx.suspend().catch(()=>{});
+  resetFonts();
 }
 function musicSet(on){
   music.on = on; store.set("hq_music", on);
   const b = document.getElementById("musicBtn");
   b.setAttribute("aria-pressed", String(on)); b.setAttribute("aria-label", on ? "Couper la musique" : "Activer la musique");
   b.replaceChildren(svg(on ? ICON_SOUND_ON : ICON_SOUND_OFF));
-  if(on) musicStart(); else { if(music.el) music.el.pause(); resetFonts(); }
+  if(on){ if(music.el){ music.el.muted = false; music.el.volume = 0.4; } musicStart(); }
+  else musicStop();
 }
 (function initMusic(){
   const b = h("button",{id:"musicBtn",class:"music",type:"button",onclick:(e)=>{ e.stopPropagation(); musicSet(!music.on); }});
   document.body.append(b); musicSet(music.on);
   // les navigateurs bloquent le son avant une première interaction : on démarre au premier geste
-  const first = ()=>{ if(music.on && !music.started) musicStart(); };
+  const first = (e)=>{ if(e.target && e.target.closest && e.target.closest("#musicBtn")) return; if(music.on && !music.started) musicStart(); };
   ["pointerdown","keydown","touchstart"].forEach(ev=>document.addEventListener(ev, first, {passive:true}));
   document.addEventListener("visibilitychange", ()=>{ if(!music.el) return; if(document.hidden) music.el.pause(); else if(music.on && music.started) music.el.play().catch(()=>{}); });
 })();
