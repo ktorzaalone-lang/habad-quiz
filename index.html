@@ -415,7 +415,7 @@ function themeScreen(opts, {title, onBack, extra, goLabel, onGo}){
 }
 
 /* ---------- solo ---------- */
-let soloOpts = store.get("hq_solo", {cat:"*", lvl:"*", n:10});
+let soloOpts = store.get("hq_solo", {cat:"*", lvl:"1", n:10});
 function soloSetup(){
   levelScreen(soloOpts, {title:"Solo", onBack:home, onPick:soloTheme});
 }
@@ -560,7 +560,7 @@ function multiHome(){
   );
 }
 
-let hostOpts = store.get("hq_host", {cat:"*", lvl:"*", n:10, t:20});
+let hostOpts = store.get("hq_host", {cat:"*", lvl:"1", n:10, t:20});
 function hostSetup(){
   levelScreen(hostOpts, {title:"Nouveau salon", onBack:multiHome, onPick:hostTheme});
 }

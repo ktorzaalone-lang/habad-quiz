@@ -1,7 +1,7 @@
 # 770 Habad Quiz
 
 Application de quiz sur Habad : les Rabbeim, la 'hassidout, les coutumes (minhaguim) et l'histoire du mouvement.
-1 565 questions réparties en 4 niveaux (Facile, Moyen, Difficile, Expert) et 8 thèmes.
+2 000 questions réparties en 4 niveaux (Facile, Moyen, Difficile, Expert ; plus de 900 faciles) et 8 thèmes.
 
 **Site :** https://ktorzaalone-lang.github.io/habad-quiz/
 
