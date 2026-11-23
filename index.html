@@ -249,7 +249,17 @@ const ICON = {
   redo:'<path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/>',
   chev:'<path d="M9 6l6 6-6 6"/>'
 };
-function render(...nodes){ app.classList.remove("enter"); app.replaceChildren(...nodes); document.body.classList.toggle("home", !!app.querySelector(".brand")); window.scrollTo(0,0); void app.offsetWidth; app.classList.add("enter"); }
+let lastScreen = null;
+function screenKey(){ const el = app.querySelector(".qtext, h2, h1, .loading"); return el ? el.textContent : ""; }
+function render(...nodes){
+  app.replaceChildren(...nodes);
+  document.body.classList.toggle("home", !!app.querySelector(".brand"));
+  // on ne rejoue le fondu et le retour en haut que si l'écran change vraiment (pas à chaque seconde du minuteur)
+  const key = screenKey();
+  const playing = !!app.querySelector(".qtext");   // pendant le jeu : aucun fondu, la question s'affiche directement
+  if(key !== lastScreen){ lastScreen = key; app.classList.remove("enter"); window.scrollTo(0,0); if(!playing){ void app.offsetWidth; app.classList.add("enter"); } }
+  else app.classList.remove("enter");
+}
 function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
 function srcLine(src){
   if(!src) return null;
