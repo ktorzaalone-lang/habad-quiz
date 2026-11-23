@@ -149,6 +149,10 @@ input.code{text-transform:uppercase;letter-spacing:.35em;font-weight:700;text-al
 .modal{position:fixed;inset:0;background:rgba(10,7,4,.75);display:grid;place-items:center;padding:20px;z-index:10}
 .modal .card{max-width:400px;width:100%;display:flex;flex-direction:column;gap:14px;background:#211a13}
 .spacer{flex:1}
+.bh{position:fixed;top:calc(env(safe-area-inset-top) + 6px);left:calc(env(safe-area-inset-left) + 12px);z-index:101;font-family:"Frank Ruhl Libre",serif;font-weight:700;font-size:.95rem;color:var(--gold);pointer-events:none;direction:rtl}
+#app{padding-top:calc(env(safe-area-inset-top) + 34px)}
+/* mode fêtes */
+.lvl .emo{width:44px;height:44px;border-radius:12px;background:color-mix(in srgb,var(--c) 18%,var(--surface-2));display:grid;place-items:center;font-size:1.4rem;flex:none}
 /* ---- écran d'accueil animé ---- */
 #splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;cursor:pointer;
   background:radial-gradient(60% 45% at 50% 45%,#3a2810 0%,#1a120a 55%,#0b0805 100%);transition:opacity .6s ease,visibility .6s}
@@ -223,6 +227,7 @@ body.home .tile{background:rgba(28,22,16,.86);backdrop-filter:blur(6px);-webkit-
 </style>
 </head>
 <body>
+<div class="bh" lang="he" aria-label="Beth Hé">ב״ה</div>
 <div id="splash" aria-hidden="true">
   <div class="sp-rings"><i></i><i></i><i></i></div>
   <div class="sp-logo"><img src="assets/icons/icon-512.png" alt=""><span class="sp-shine"></span></div>
@@ -282,6 +287,7 @@ function h(tag, attrs, ...kids){
 function svg(path){ const s = document.createElementNS("http://www.w3.org/2000/svg","svg"); s.setAttribute("viewBox","0 0 24 24"); s.setAttribute("fill","none"); s.setAttribute("stroke","currentColor"); s.setAttribute("stroke-width","1.8"); s.setAttribute("stroke-linecap","round"); s.setAttribute("stroke-linejoin","round"); s.innerHTML = path; return s; }
 const ICON = {
   flame:'<path d="M12 3c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-7.5Z"/><path d="M6 21h12"/>',
+  fete:'<path d="M12 2v3"/><path d="M5 8h14"/><path d="M7 8v6a5 5 0 0 0 10 0V8"/><path d="M12 19v3M8 22h8"/>',
   solo:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.6 4-5 7-5s5.8 1.4 7 5"/>',
   multi:'<circle cx="8" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M2.5 19c1-3 3.2-4.5 5.5-4.5s4.5 1.5 5.5 4.5"/><path d="M14 15.2c.9-.5 1.9-.7 3-.7 2 0 3.6 1.2 4.5 3.8"/>',
   stats:'<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>',
@@ -327,7 +333,9 @@ function chipGroup(options, value, onChange){
   }
   draw(); return wrap;
 }
-function pool(cat, lvl){ const out=[]; Q.forEach((q,i)=>{ if((cat==="*"||q[5]===cat) && (lvl==="*"||q[4]===lvl)) out.push(i); }); return out; }
+function pool(cat, lvl){ const out=[]; Q.forEach((q,i)=>{ if(!q[7] && (cat==="*"||q[5]===cat) && (lvl==="*"||q[4]===lvl)) out.push(i); }); return out; }
+function fetePool(fete, lvl){ const out=[]; Q.forEach((q,i)=>{ if(q[7]==="fete" && q[5]===fete && (lvl==="*"||q[4]===lvl)) out.push(i); }); return out; }
+let NMAIN = 0;
 function countFor(cat, lvl){ return pool(cat,lvl).length; }
 
 /* ---------- musique de fond ---------- */
@@ -426,9 +434,10 @@ function home(){
     h("div",{class:"brand"}, svg(ICON.flame), "Hassidout · Histoire · Minhaguim"),
     h("div",{class:"title-block"},
       beatTitle(),
-      h("p",{class:"muted"}, `${Q.length.toLocaleString("fr-FR")} questions sur les Rabbeim, la 'hassidout, les coutumes et l'histoire de Habad.`)),
+      h("p",{class:"muted"}, `${NMAIN.toLocaleString("fr-FR")} questions sur les Rabbeim, la 'hassidout, les coutumes et l'histoire de Habad.`)),
     h("div",{class:"stack"},
       tile(ICON.solo, "Jouer en solo", "Choisissez un niveau, puis un thème", ()=>soloSetup(), " main"),
+      tile(ICON.fete, "Mode fêtes", "Tichri, 'Hanouka, Pessa'h, Chavouot : Habad et les fêtes", ()=>feteSetup()),
       tile(ICON.multi, "Mode multijoueur", "Créer un salon ou rejoindre une partie avec un code", multiHome),
       mistakes ? tile(ICON.redo, "Revoir mes erreurs", `${mistakes} question${mistakes>1?"s":""} à retravailler`, ()=>startSolo(shuffle(Object.keys(progress).filter(k=>progress[k][2]===0).map(Number)).slice(0,20),"Mes erreurs")) : null,
       tile(ICON.stats, "Ma progression", answered ? `${answered} questions vues · ${Math.round(ok/answered*100)} % de réussite` : "Aucune question jouée pour l'instant", statsScreen)),
@@ -485,6 +494,45 @@ function themeScreen(opts, {title, onBack, extra, goLabel, onGo}){
     h("div",{class:"sticky"}, go)
   );
   draw();
+}
+
+/* ---------- mode fêtes ---------- */
+const FETES = [
+  {v:"Tichri", emo:"🍎", d:"Roch Hachana, Kippour, Souccot, Sim'hat Torah", c:"var(--l2)"},
+  {v:"'Hanouka", emo:"🕎", d:"Les lumières, la 'hanoukia et les campagnes du Rabbi", c:"var(--l3)"},
+  {v:"Pessa'h", emo:"🫓", d:"Le Séder, la matsa chmoura et le repas du Machia'h", c:"var(--l1)"},
+  {v:"Chavouot", emo:"📜", d:"Le don de la Torah et les enfants au 10 Commandements", c:"var(--gold)"}
+];
+const FETE_LEVELS = [
+  {v:"1", name:"Facile", d:"Pour les enfants et ceux qui découvrent", c:"var(--l1)"},
+  {v:"2", name:"Moyen", d:"Pour tout le monde", c:"var(--l2)"},
+  {v:"3", name:"Difficile", d:"Pour les connaisseurs", c:"var(--l4)"}
+];
+let feteOpts = store.get("hq_fete", {fete:"Tichri", lvl:"1"});
+function feteSetup(){
+  render(
+    header("Mode fêtes", home),
+    h("div",{class:"stack"}, steps(1), h("span",{class:"step"},"Étape 1 sur 2 · Fête"), h("h2",null,"Choisissez une fête")),
+    h("div",{class:"lvls"}, FETES.map(f=>{
+      const n = fetePool(f.v,"*").length;
+      return h("button",{class:"lvl"+(feteOpts.fete===f.v?" on":""),style:`--c:${f.c}`,disabled:n===0,onclick:()=>{ feteOpts.fete=f.v; feteLevel(); }},
+        h("div",{class:"emo","aria-hidden":"true"},f.emo), h("div",{class:"body"},h("b",null,f.v),h("span",null,f.d), progBar(fetePool(f.v,"*").filter(i=>progress[i]&&progress[i][2]===1).length, n, f.c)));
+    }))
+  );
+}
+function feteLevel(){
+  render(
+    header("Mode fêtes", feteSetup),
+    h("div",{class:"stack"}, steps(2), h("span",{class:"step"},"Étape 2 sur 2 · Niveau"), h("h2",null,feteOpts.fete+" : choisissez un niveau")),
+    h("div",{class:"lvls"}, FETE_LEVELS.map(l=>{
+      const ids = fetePool(feteOpts.fete,l.v), n = ids.length;
+      return h("button",{class:"lvl"+(feteOpts.lvl===l.v?" on":""),style:`--c:${l.c}`,disabled:n===0,onclick:()=>{
+          feteOpts.lvl=l.v; store.set("hq_fete",feteOpts);
+          startSolo(shuffle(ids).slice(0,15), feteOpts.fete+" · "+l.name);
+        }},
+        bars(l.v), h("div",{class:"body"},h("b",null,l.name),h("span",null,l.d), progBar(ids.filter(i=>progress[i]&&progress[i][2]===1).length, n, l.c)));
+    }))
+  );
 }
 
 /* ---------- solo ---------- */
@@ -927,10 +975,14 @@ function endView(st){
 
 /* ---------- boot ---------- */
 if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js").catch(()=>{}); }catch(e){} }
-fetch("data/questions.json").then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(data=>{
-  Q = data;
+Promise.all([
+  fetch("data/questions.json").then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }),
+  fetch("data/fetes.json").then(r=> r.ok ? r.json() : []).catch(()=>[])
+]).then(([data, fetes])=>{
+  NMAIN = data.length;
+  Q = data.concat(fetes.map(f=>[f[0],f[1],f[2],f[3],f[4],f[5],f[6],"fete"]));
   const order = ["Les 7 Rabbeim","Philosophie & Textes","Minhaguim & Coutumes","Histoire & Dates","Histoire & Lieux","Mivtsaim & Campagnes","Institutions & Rayonnement","Nigounim & Figures"];
-  const seen = [...new Set(Q.map(q=>q[5]))];
+  const seen = [...new Set(data.map(q=>q[5]))];
   CATS = order.filter(c=>seen.includes(c)).concat(seen.filter(c=>!order.includes(c)));
   home();
 }).catch(()=>{
