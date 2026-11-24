@@ -334,7 +334,8 @@ function chipGroup(options, value, onChange){
   draw(); return wrap;
 }
 function pool(cat, lvl){ const out=[]; Q.forEach((q,i)=>{ if(!q[7] && (cat==="*"||q[5]===cat) && (lvl==="*"||q[4]===lvl)) out.push(i); }); return out; }
-function fetePool(fete, lvl){ const out=[]; Q.forEach((q,i)=>{ if(q[7]==="fete" && q[5]===fete && (lvl==="*"||q[4]===lvl)) out.push(i); }); return out; }
+function subOf(q){ return q[6]==="Elloul" ? "Roch Hachana" : q[6]; }
+function fetePool(fete, lvl, sub){ const out=[]; Q.forEach((q,i)=>{ if(q[7]==="fete" && q[5]===fete && (lvl==="*"||q[4]===lvl) && (!sub||sub==="*"||subOf(q)===sub)) out.push(i); }); return out; }
 let NMAIN = 0;
 function countFor(cat, lvl){ return pool(cat,lvl).length; }
 
@@ -453,7 +454,7 @@ function progBar(m, n, c, compact){
   const txt = compact ? (m ? `${m} / ${n} · ${pct} %` : `${n} question${n>1?"s":""}`) : (m ? `${m} / ${n} maîtrisées · ${pct} %` : `${n} question${n>1?"s":""} · non commencé`);
   return h("div",{class:"prog",style:c?`--c:${c}`:null}, h("div",{class:"bar"},h("i",{style:`width:${pct}%`})), h("small",null, txt));
 }
-function steps(k){ return h("div",{class:"steps","aria-label":`Étape ${k} sur 2`}, h("i",{class:"on"}), h("i",{class:k>1?"on":""})); }
+function steps(k,t){ t=t||2; return h("div",{class:"steps","aria-label":`Étape ${k} sur ${t}`}, Array.from({length:t},(_,j)=>h("i",{class:j<k?"on":""}))); }
 function bars(lv){ const w = h("div",{class:"bars"}); for(let i=1;i<=4;i++) w.append(h("i",{class: lv==="*" || i<=Number(lv) ? "f" : ""})); return w; }
 function levelScreen(opts, {title, onBack, onPick}){
   const items = [...Object.keys(LEVELS).map(v=>({v, name:LEVELS[v], d:LEVEL_INFO[v].d, c:LEVEL_INFO[v].c})),
@@ -498,7 +499,12 @@ function themeScreen(opts, {title, onBack, extra, goLabel, onGo}){
 
 /* ---------- mode fêtes ---------- */
 const FETES = [
-  {v:"Tichri", emo:"🍎", d:"Roch Hachana, Kippour, Souccot, Sim'hat Torah", c:"var(--l2)"},
+  {v:"Tichri", emo:"🍎", d:"Roch Hachana, Kippour, Souccot, Sim'hat Torah", c:"var(--l2)", subs:[
+    {v:"*", emo:"🍂", name:"Tichri en général", d:"Toutes les fêtes du mois mélangées"},
+    {v:"Roch Hachana", emo:"🍯", name:"Roch Hachana", d:"Le chofar, la pomme au miel et Elloul"},
+    {v:"Kippour", emo:"🤍", name:"Kippour", d:"Les Kaparot, le jeûne et Neïla"},
+    {v:"Souccot", emo:"🌿", name:"Souccot", d:"La soucca, le loulav et l'étrog"},
+    {v:"Sim'hat Torah", emo:"💃", name:"Sim'hat Torah", d:"Les Hakafot et la joie de la Torah"}]},
   {v:"'Hanouka", emo:"🕎", d:"Les lumières, la 'hanoukia et les campagnes du Rabbi", c:"var(--l3)"},
   {v:"Pessa'h", emo:"🫓", d:"Le Séder, la matsa chmoura et le repas du Machia'h", c:"var(--l1)"},
   {v:"Chavouot", emo:"📜", d:"Le don de la Torah et les enfants au 10 Commandements", c:"var(--gold)"}
@@ -508,27 +514,43 @@ const FETE_LEVELS = [
   {v:"2", name:"Moyen", d:"Pour tout le monde", c:"var(--l2)"},
   {v:"3", name:"Difficile", d:"Pour les connaisseurs", c:"var(--l4)"}
 ];
-let feteOpts = store.get("hq_fete", {fete:"Tichri", lvl:"1"});
+let feteOpts = store.get("hq_fete", {fete:"Tichri", lvl:"1", sub:"*"});
+function feteInfo(){ return FETES.find(f=>f.v===feteOpts.fete); }
+function feteSub(){ const f=feteInfo(); return f.subs ? (feteOpts.sub||"*") : "*"; }
+function feteTotal(){ return feteInfo().subs ? 3 : 2; }
+function feteLabel(){ const f=feteInfo(); if(!f.subs) return f.v; const s=f.subs.find(x=>x.v===feteSub()); return s.v==="*" ? f.v : s.name; }
+function feteSubScreen(){
+  const f=feteInfo();
+  render(
+    header("Mode fêtes", feteSetup),
+    h("div",{class:"stack"}, steps(2,3), h("span",{class:"step"},"Étape 2 sur 3 · Fête"), h("h2",null,f.v+" : que voulez-vous réviser ?")),
+    h("div",{class:"lvls"}, f.subs.map(sb=>{
+      const ids = fetePool(f.v,"*",sb.v), n = ids.length;
+      return h("button",{class:"lvl"+(feteSub()===sb.v?" on":""),style:`--c:${f.c}`,disabled:n===0,onclick:()=>{ feteOpts.sub=sb.v; feteLevel(); }},
+        h("div",{class:"emo","aria-hidden":"true"},sb.emo), h("div",{class:"body"},h("b",null,sb.name),h("span",null,sb.d), progBar(ids.filter(i=>progress[i]&&progress[i][2]===1).length, n, f.c)));
+    }))
+  );
+}
 function feteSetup(){
   render(
     header("Mode fêtes", home),
-    h("div",{class:"stack"}, steps(1), h("span",{class:"step"},"Étape 1 sur 2 · Fête"), h("h2",null,"Choisissez une fête")),
+    h("div",{class:"stack"}, steps(1,feteTotal()), h("span",{class:"step"},"Étape 1 · Fête"), h("h2",null,"Choisissez une fête")),
     h("div",{class:"lvls"}, FETES.map(f=>{
       const n = fetePool(f.v,"*").length;
-      return h("button",{class:"lvl"+(feteOpts.fete===f.v?" on":""),style:`--c:${f.c}`,disabled:n===0,onclick:()=>{ feteOpts.fete=f.v; feteLevel(); }},
+      return h("button",{class:"lvl"+(feteOpts.fete===f.v?" on":""),style:`--c:${f.c}`,disabled:n===0,onclick:()=>{ feteOpts.fete=f.v; f.subs ? feteSubScreen() : feteLevel(); }},
         h("div",{class:"emo","aria-hidden":"true"},f.emo), h("div",{class:"body"},h("b",null,f.v),h("span",null,f.d), progBar(fetePool(f.v,"*").filter(i=>progress[i]&&progress[i][2]===1).length, n, f.c)));
     }))
   );
 }
 function feteLevel(){
   render(
-    header("Mode fêtes", feteSetup),
-    h("div",{class:"stack"}, steps(2), h("span",{class:"step"},"Étape 2 sur 2 · Niveau"), h("h2",null,feteOpts.fete+" : choisissez un niveau")),
+    header("Mode fêtes", feteInfo().subs ? feteSubScreen : feteSetup),
+    h("div",{class:"stack"}, steps(feteTotal(),feteTotal()), h("span",{class:"step"},`Étape ${feteTotal()} sur ${feteTotal()} · Niveau`), h("h2",null,feteLabel()+" : choisissez un niveau")),
     h("div",{class:"lvls"}, FETE_LEVELS.map(l=>{
-      const ids = fetePool(feteOpts.fete,l.v), n = ids.length;
+      const ids = fetePool(feteOpts.fete,l.v,feteSub()), n = ids.length;
       return h("button",{class:"lvl"+(feteOpts.lvl===l.v?" on":""),style:`--c:${l.c}`,disabled:n===0,onclick:()=>{
           feteOpts.lvl=l.v; store.set("hq_fete",feteOpts);
-          startSolo(shuffle(ids).slice(0,15), feteOpts.fete+" · "+l.name);
+          startSolo(shuffle(ids).slice(0,15), feteLabel()+" · "+l.name);
         }},
         bars(l.v), h("div",{class:"body"},h("b",null,l.name),h("span",null,l.d), progBar(ids.filter(i=>progress[i]&&progress[i][2]===1).length, n, l.c)));
     }))
