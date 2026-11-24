@@ -43,3 +43,13 @@ Les réponses sont mélangées automatiquement à l'affichage.
 ## Publication
 
 Le site est publié par GitHub Pages depuis la branche `main`, à la racine du dépôt. Toute modification poussée sur `main` est en ligne en une à deux minutes.
+
+## Ajouter des photos aux questions
+
+1. Déposer la photo dans `assets/photos/` (format .jpg, environ 1200 px de large).
+2. Ajouter une ligne dans `data/photos.json` :
+   ```json
+   {"file": "rabbi-farbrenguen.jpg", "keys": ["Rabbi", "farbrenguen"], "caption": "Le Rabbi lors d'un farbrenguen"}
+   ```
+   La photo s'affiche au-dessus de chaque question dont le texte ou la réponse contient un des mots-clés.
+   Si plusieurs photos correspondent, le site alterne entre elles selon la question.
