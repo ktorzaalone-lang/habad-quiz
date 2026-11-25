@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="770 Quiz">
 <meta name="theme-color" content="#110d09">
-<meta name="description" content="770 Habad Quiz : plus de 1000 questions sur les Rabbeim, la 'hassidout, les minhaguim et l'histoire de Habad.">
+<meta name="description" content="770 Habad Quiz : 2000 questions sur les Rabbeim, la 'hassidout, les minhaguim et l'histoire de Habad.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@700&family=Frank+Ruhl+Libre:wght@700;900&family=Playfair+Display:ital,wght@1,900&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -516,6 +516,13 @@ function photoFor(id){
   let hsh = 0; for(const c of q[0]) hsh = (hsh*31 + c.charCodeAt(0)) >>> 0;
   return hits[hsh % hits.length];   // plusieurs photos possibles : on varie selon la question
 }
+// Limite les questions faciles à 30 % d'une partie quand plusieurs niveaux sont mélangés
+function pickBalanced(ids, n){
+  const easy = shuffle(ids.filter(i=>Q[i][4]==="1")), rest = shuffle(ids.filter(i=>Q[i][4]!=="1"));
+  if(!easy.length || !rest.length) return shuffle(ids).slice(0, n);
+  const ne = Math.min(easy.length, Math.max(n - rest.length, Math.round(n*0.3)));
+  return shuffle(easy.slice(0, ne).concat(rest.slice(0, n - ne))).slice(0, n);
+}
 function countFor(cat, lvl){ return pool(cat,lvl).length; }
 
 /* ---------- musique de fond ---------- */
@@ -651,7 +658,7 @@ function quickIds(n){
   const lv = r <= 1 ? ["1","2"] : r <= 3 ? ["2","3"] : ["3","4"];
   const all = []; Q.forEach((q,i)=>{ if(!q[7] && lv.includes(q[4])) all.push(i); });
   const fresh = shuffle(all.filter(i=>!progress[i])), seen = shuffle(all.filter(i=>progress[i] && progress[i][2]===0));
-  return fresh.concat(seen, shuffle(all)).filter((v,i,a)=>a.indexOf(v)===i).slice(0, n);
+  return pickBalanced(fresh.concat(seen, shuffle(all)).filter((v,i,a)=>a.indexOf(v)===i).slice(0, n*3), n);
 }
 function expertIds(n){
   const all = []; Q.forEach((q,i)=>{ if(!q[7] && (q[4]==="4" || q[4]==="3")) all.push(i); });
@@ -819,7 +826,7 @@ function soloTheme(){
       chipGroup([10,20,50].map(n=>({v:n,l:String(n)})), soloOpts.n, v=>{soloOpts.n=v;})),
     onGo:()=>{
       store.set("hq_solo", soloOpts);
-      const ids = shuffle(pool(soloOpts.cat, soloOpts.lvl)).slice(0, soloOpts.n);
+      const ids = pickBalanced(pool(soloOpts.cat, soloOpts.lvl), soloOpts.n);
       startSolo(ids, soloOpts.cat==="*" ? "Tous les thèmes" : soloOpts.cat);
     }});
 }
@@ -1138,7 +1145,7 @@ function hostGone(){
 function hostInit(){
   const g = game;
   g.players = {};      // peer -> {nm, s, ans:{} }
-  g.ids = shuffle(pool(hostOpts.cat, hostOpts.lvl)).slice(0, hostOpts.n);
+  g.ids = pickBalanced(pool(hostOpts.cat, hostOpts.lvl), hostOpts.n);
   g.time = hostOpts.t;
   g.cat = hostOpts.cat === "*" ? "Tous les thèmes" : hostOpts.cat;
   g.phase = "lobby"; g.i = -1; g.v = 0; g.order = null; g.deadline = 0; g.revealUntil = 0;
@@ -1301,7 +1308,7 @@ function endView(st){
     h("div",{class:"spacer"}),
     g.isHost
       ? h("div",{class:"row"},
-          h("button",{class:"btn primary grow",onclick:()=>{ g.ids = shuffle(pool(hostOpts.cat, hostOpts.lvl)).slice(0, hostOpts.n); g.phase="lobby"; g.i=-1; for(const k in g.players){ g.players[k].s=0; g.players[k].ans={}; } hostPublish(); }},"Nouvelle manche"),
+          h("button",{class:"btn primary grow",onclick:()=>{ g.ids = pickBalanced(pool(hostOpts.cat, hostOpts.lvl), hostOpts.n); g.phase="lobby"; g.i=-1; for(const k in g.players){ g.players[k].s=0; g.players[k].ans={}; } hostPublish(); }},"Nouvelle manche"),
           h("button",{class:"btn ghost center grow",onclick:()=>{ leaveGame(); home(); }},"Terminer"))
       : h("button",{class:"btn ghost center",onclick:()=>{ leaveGame(); home(); }},"Retour à l'accueil")
   );
